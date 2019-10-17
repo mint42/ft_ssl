@@ -1,25 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   struct_arg.c                                       :+:      :+:    :+:   */
+/*   sha256_get_arguments.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/16 15:06:23 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/17 13:13:25 by rreedy           ###   ########.fr       */
+/*   Created: 2019/10/17 10:37:47 by rreedy            #+#    #+#             */
+/*   Updated: 2019/10/17 13:50:35 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "arg.h"
 #include "errors.h"
-#include "ft_mem.h"
+#include "input.h"
+#include "ft_queue.h"
 
-int		init_arg(struct s_arg **arg, char *string, int type)
+int		sha256_get_arguments(int argc, char **argv, int *argv_index, struct s_input *input)
 {
-	*arg = (struct s_arg *)ft_memalloc(sizeof(struct s_arg));
-	if (!arg)
-		return (ERROR);
-	(*arg)->arg = string;
-	(*arg)->type = type;
+	struct s_arg	*arg;
+
+	arg = 0;
+	while (*argv_index < argc)
+	{
+		if (init_arg(&arg, argv[*argv_index], TYPE_FILE))
+			return (ERROR);
+		ft_enqueue(input->args, arg);
+		++(*argv_index);
+	}
+	if (!input->args)
+	{
+		if (init_arg(&arg, 0, TYPE_STDIN))
+			return (ERROR);
+		ft_enqueue(input->args, arg);
+	}
 	return (0);
 }

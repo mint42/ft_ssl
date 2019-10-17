@@ -1,30 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   arg.h                                              :+:      :+:    :+:   */
+/*   md5.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/16 14:58:00 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/17 13:34:09 by rreedy           ###   ########.fr       */
+/*   Created: 2019/10/17 12:25:09 by rreedy            #+#    #+#             */
+/*   Updated: 2019/10/17 13:54:25 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ARG_H
-# define ARG_H
+#ifndef MD5_H
+# define MD5_H
 
-# define TYPE_STDIN 1
-# define TYPE_STRING 2
-# define TYPE_FILE 3
+# define MD5_HASH_SIZE 128
 
-# define ARG(args) ((struct s_arg *)((args)->first->content))
-
-struct			s_arg
+enum		e_md5_ops
 {
-	char		*arg;
-	int			type;
+	MD5_OP_P = 0,
+	MD5_OP_Q,
+	MD5_OP_R,
+	MD5_OP_S,
+	MD5_TOTAL_VALID_OPS,
 };
 
-int		init_arg(struct s_arg **arg, char *string, int type);
+struct s_input;
+
+int		md5_get_arguments(int argc, char **argv, int *argv_index, struct s_input *input);
+int		md5_get_options(int argc, char **argv, int *argv_index, struct s_input *input);
+void	md5_hash(char *hash, char *arg_content);
+int		md5_main(int argc, char **argv);
 
 #endif

@@ -1,21 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   struct_input.c                                     :+:      :+:    :+:   */
+/*   md5_hash.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/16 13:17:33 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/16 13:18:00 by rreedy           ###   ########.fr       */
+/*   Created: 2019/10/17 10:43:46 by rreedy            #+#    #+#             */
+/*   Updated: 2019/10/17 13:19:19 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "input.h"
+#include "md5.h"
+#include "ft_str.h"
 
-void			init_input(struct s_input *input)
+void	md5_hash(char *hash, char *string)
 {
-	input.comm = 0;
-	input.opts = 0;
-	input.args = 0;
-	input.n_args = 0;
+	ft_strncpy(hash, string, MD5_HASH_SIZE);
 }

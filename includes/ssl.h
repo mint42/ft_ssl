@@ -1,30 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   arg.h                                              :+:      :+:    :+:   */
+/*   ssl.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/16 14:58:00 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/17 13:34:09 by rreedy           ###   ########.fr       */
+/*   Created: 2019/10/17 12:30:24 by rreedy            #+#    #+#             */
+/*   Updated: 2019/10/17 12:34:06 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ARG_H
-# define ARG_H
+#ifndef SSL_H
+# define SSL_H
 
-# define TYPE_STDIN 1
-# define TYPE_STRING 2
-# define TYPE_FILE 3
+# define TOTAL_VALID_COMMANDS 2
 
-# define ARG(args) ((struct s_arg *)((args)->first->content))
-
-struct			s_arg
-{
-	char		*arg;
-	int			type;
-};
-
-int		init_arg(struct s_arg **arg, char *string, int type);
+/*
+**	enum	e_commands
+**	{
+**		MD5 = 0,
+**		SHA256,
+**		TOTAL_COMMANDS,
+**	};
+*/
 
 #endif

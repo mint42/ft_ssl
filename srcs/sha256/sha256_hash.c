@@ -1,23 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   hash.h                                             :+:      :+:    :+:   */
+/*   sha256_hash.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/16 13:05:34 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/16 13:16:16 by rreedy           ###   ########.fr       */
+/*   Created: 2019/10/17 13:48:10 by rreedy            #+#    #+#             */
+/*   Updated: 2019/10/17 13:50:08 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HASH_H
-# define HASH_H
+#include "sha256.h"
+#include "ft_str.h"
 
-struct s_hash	hash
+void	sha256_hash(char *hash, char *string)
 {
-	int		fd;
-	char	*file_content;
-	char	*hash;
+	ft_strncpy(hash, string, SHA256_HASH_SIZE);
 }
-
-#endif
