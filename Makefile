@@ -6,7 +6,7 @@
 #    By: rreedy <marvin@42.fr>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/16 11:54:37 by rreedy            #+#    #+#              #
-#    Updated: 2019/10/17 12:19:33 by rreedy           ###   ########.fr        #
+#    Updated: 2019/10/17 14:57:22 by rreedy           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -41,7 +41,3 @@ fclean: clean
 	@- make -C libft/ fclean
 
 re: fclean all
-
-#	debug: fclean
-#		$(CC) $(CFLAGS) -g $(OBJS) $(MD5_OBJS) $(SHA256_OBJS) -o $(NAME) $(LFLAGS)
-#		@- make -C libft/ debug

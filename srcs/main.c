@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/16 12:02:51 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/17 13:52:56 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/17 15:00:12 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ int				main(int argc, char **argv)
 		write(STDOUT_FD, "usage: ft_ssl command [command opts] [command args]\n", 52);
 		return (0);
 	}
-	command= get_command(argv[1]);
+	command = get_command(argv[1]);
 	if (command == -1)
 	{
 		ft_printf("ft_ssl: Error: '%s' is an invalid command.\n", argv[1]);

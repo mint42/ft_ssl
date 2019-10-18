@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:37:47 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/17 13:50:35 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/17 17:07:18 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int		sha256_get_arguments(int argc, char **argv, int *argv_index, struct s_input
 		ft_enqueue(input->args, arg);
 		++(*argv_index);
 	}
-	if (!input->args)
+	if (!((input->args)->first))
 	{
 		if (init_arg(&arg, 0, TYPE_STDIN))
 			return (ERROR);
