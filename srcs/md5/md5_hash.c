@@ -6,12 +6,14 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:43:46 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/18 14:10:30 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/18 16:44:45 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "md5.h"
 #include "ft_str.h"
+
+# define ROTATE(bits, rot) (((bits) << (rot)) | ((bits) >> (32 - (rot))));
 
 /*
 **	NOTES
@@ -36,22 +38,10 @@
 */
 
 /*
-**	These functions (macros for now) will be used by the 4 word buffers
-**	(A,B,C,D) to turn 3 words of input into 1 word of output. Each of these
-**	functions is done once for every "round" of data (512 bits) that needs to
-**	be transformed
-*/
-
-# define F(B,C,D) ((B & C) | (~B & D))
-# define G(B,C,D) ((B & D) | (C & ~D))
-# define H(B,C,D) (B ^ C ^ D)
-# define I(B,C,D) ((C ^ (B | ~D)
-
-/*
 ** This table is used to figure out how far left you rotate the buffer each round
 */
 
-const uint32_t g_rot[] =
+const uint32_t g_rot[64] =
 {
 	7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12,
 	17, 22, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 4, 11, 16,
@@ -87,63 +77,106 @@ const uint32_t g_T[64] =
 	0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
 };
 
-void	form_message_digest(char *md, struct s_md5 *md5)
+static void	execute_round(int round, unsigned int *tmp, unsigned int *buff_chunks)
 {
+	int				chunk;
 
+	chunk = 0;
+	if (round < 16)
+		rounds0to15(tmp, &chunk);
+	else if (round < 32)
+		rounds16to31(tmp, &chunk);
+	else if (round < 48)
+		rounds32to47(tmp, &chunk);
+	else
+		rounds48to63(words, &chunk);
+	tmp[F] = tmp[F] + tmp[A] + g_T[round] + buff_chunks[chunk];
+	tmp[A] = tmp[D];
+	tmp[D] = tmp[C];
+	tmp[C] = tmp[B];
+	tmp[B] = tmp[B] + ROTATE(tmp[F], g_rot[round]);
 }
 
-
-int		fill_data_buffer(struct s_md5 *md5, char *content, int content_size)
+static void	update_words(unsigned int *words, char *buff)
 {
+	unsigned int	buff_chunks[16];
+	unsigned int	tmp_words[5];
+	int				i;
 
-}
-
-void	transform_data(struct s_md5)
-{
-
-}
-
-void	pad_content(char *content, int content_size)
-{
-
-}
-
-void	init_md5(struct s_md5 *md5)
-{
-	int		i;
-
+	i = 0;
+	while (i < 16)
+	{
+		ft_memcpy(buff_chunks[i], buff[i * 4], 4);
+		++i;
+	}
+	tmp_words[A] = words[A];
+	tmp_words[B] = words[B];
+	tmp_words[C] = words[C];
+	tmp_words[D] = words[D];
 	i = 0;
 	while (i < 64)
 	{
-		md5->data[i] = 0;
+		execute_round(i, tmp_words, chunks);
 		++i;
 	}
-	md5->data_len_bytes = 0;
-	md5->data_len_bits[0] = 0;
-	md5->data_len_bits[1] = 0;
-	md5->word[A] = 0x67452301;
-	md5->word[B] = 0xefcdab89;
-	md5->word[C] = 0x98badcfe;
-	md5->word[D] = 0x10325476;
+	words[A] = words[A] + tmp_words[A];
+	words[B] = words[B] + tmp_words[B];
+	words[C] = words[C] + tmp_words[C];
+	words[D] = words[D] + tmp_words[D];
 }
 
-void	md5_hash(char *md, char *content, int content_size)
-{
-	struct s_md5	md5;
-	int				content_index;
-	int				bytes_filled;
+/*
+**	The string MUST be padded as part of the md5 algorithm. The padding works
+**	such that the length (in bits) of the data being hashed should be a
+**	multiple of 512 bits (64 bytes), because data is transformed in chunks of
+**	this size.
+**
+**	To pad the data, first a '1' bit must be concatonated to the end of the
+**	data string, followed by as many '0' bits as it takes to make its size
+**	divisible by 64. The end of this string, after the '0' bits, will contain
+**	a 64 bit (8 byte) long repsenation of the original data size.
+*/
 
-	init_md5(&md5);
-	pad_content(&content, &content_size);
-	content_index = 0;
-	while (content_index < content_size)
+static int	pad_data(char **data, int *data_size)
+{
+	char	*padded_data;
+	int		padded_data_size;
+	int		bit_representation;
+
+	padded_data_size = data_size + 1;
+	while ((padded_data_size + 8) % 64)
+		++padded_data_size;
+	padded_data = ft_strnew(padded_data_size + 8); if (!padded_data)
+		return (ERROR);
+	ft_memcpy(padded_data, *data, data_size);
+	padded_data[*data_size] = (unsigned char)0x80;
+	bit_representation = data_size * 8;
+	ft_memcpy(padded_data + padded_data_size, &bit_representation, 4);
+	ft_strdel(data);
+	*data = padded_data;
+	*data_size = padded_data_size;
+	return (0);
+}
+
+void		md5_hash(char *hash, char **data, int data_size)
+{
+	char			buff[64];
+	unsigned int	words[4];
+	int				data_processed;
+
+	words[A] = 0x67452301;
+	words[B] = 0xefcdab89;
+	words[C] = 0x98badcfe;
+	words[D] = 0x10325476;
+	if (pad_data(data, &data_size) == ERROR)
+		return (0);
+	data_processed = 0;
+	while (data_processed < data_size)
 	{
-		bytes_filled = fill_data_buffer(&md5, content, content_size, content_index);
-		if (bytes_filled < 64)
-			return (ERROR);
-		content_index = content_index + 64;
-		transform_data(&md5);
+		ft_memcpy(buff, *data + data_processed, 64);
+		update_words(words, buff);
+		data_processed = data_processed + 64;
 	}
-	form_message_digest(md, &md5);
+	hash = ft_sprintf("%x%x%x%x", words[A], words[B], words[C], words[D]);
 	return (0);
 }
