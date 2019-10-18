@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/16 15:49:52 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/17 17:13:00 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/17 17:57:14 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 #include "md5.h"
 #include "ft_fd.h"
 #include "ft_printf.h"
-#include "ft_put.h"
 #include "ft_queue.h"
 #include "ft_str.h"
 #include <errno.h>
@@ -24,16 +23,16 @@
 #include <string.h>
 #include <unistd.h>
 
-static void print_hash(char *hash, char *arg_content, struct s_input *input)
+static void print_hash(char *hash, char *content, int content_size, struct s_input *input)
 {
 	if (ARG(input->args)->type == TYPE_STDIN)
 	{
 		if (input->opts & MD5_OP_P)
-			ft_putendl(arg_content);
-		ft_putendl(hash);
+			write(STDOUT_FD, content, content_size);
+		write(STDOUT_FD, hash, MD5_HASH_SIZE);
 	}
 	else if (input->opts & MD5_OP_Q)
-		ft_putendl(hash);
+		write(STDOUT_FD, hash, MD5_HASH_SIZE);
 	else if (ARG(input->args)->type == TYPE_FILE)
 	{
 		if (input->opts & MD5_OP_R)
@@ -50,79 +49,80 @@ static void print_hash(char *hash, char *arg_content, struct s_input *input)
 	}
 }
 
-static int	get_file(int fd, char **content)
+static int	read_file(int fd, char **content, int *content_size)
 {
-	int		content_size;
-	int		total_red;
+	int		max_content_size;
 	int		red;
 
-	content_size = 80;
-	*content = ft_strnew(content_size);
+	max_content_size = 80;
+	*content = ft_strnew(max_content_size);
 	if (!*content)
 	{
 		write(STDOUT_FD, "failed to allocate\n", 19);
 		return (ERROR);
 	}
-	total_red = 0;
+	*content_size = 0;
 	red = 1;
 	while (red > 0)
 	{
-		red = read(fd, (*content) + total_red, 80);
-		total_red = total_red + red;
-		if (total_red == content_size)
+		red = read(fd, *content + *content_size, 80);
+		*content_size = *content_size + red;
+		if (*content_size == max_content_size)
 		{
-			content_size = content_size * 2;
-			ft_stresize(content, 0, content_size);
+			max_content_size = max_content_size * 2;
+			ft_stresize(content, 0, max_content_size);
 		}
 	}
-	return (0);
+	return (red);
 }
 
-static int	get_content_from_fd(struct s_arg *arg, char **arg_content, int *fd)
+static int	get_content_from_fd(struct s_arg *arg, char **content, int *content_size)
 {
+	int		fd;
+
 	if (arg->type == TYPE_FILE)
-		*fd = open(arg->arg, O_RDONLY);
-	else
-		*fd = STDIN_FD;
-	if (*fd == -1)
-		return (ERROR);
-	if (get_file(*fd, arg_content) == ERROR)
 	{
-		write(STDOUT_FD, "failed to get file\n", 20);
+		fd = open(arg->arg, O_RDONLY);
+		if (fd == -1)
+		{
+			ft_printf("ft_ssl: md5: %s: %s\n", arg->arg, strerror(errno));
+			return (ERROR);
+		}
+	}
+	else
+		fd = STDIN_FD;
+	if (read_file(fd, content, content_size) == -1)
+	{
+		ft_printf("ft_ssl: md5: %s\n", strerror(errno));
 		return (ERROR);
 	}
-	if (close(*fd) == -1)
+	if (close(fd) == -1)
+	{
+		ft_printf("ft_ssl: md5: %s: %s\n", arg->arg, strerror(errno));
 		return (ERROR);
+	}
 	return (0);
 }
 
 static int	handle_argument(struct s_input *input)
 {
 	static char		hash[MD5_HASH_SIZE];
-	char			*arg_content;
-	int				fd;
+	char			*content;
+	int				content_size;
 
-	fd = 0;
-	arg_content = 0;
+	content = 0;
+	content_size = 0;
 	if (ARG(input->args)->type == TYPE_STRING)
-		arg_content = ARG(input->args)->arg;
+		content = ARG(input->args)->arg;
 	else
 	{
-		if (get_content_from_fd(ARG(input->args), &arg_content, &fd) == ERROR)
-		{
-			ft_printf("ft_ssl: md5: %s: %s\n", ARG(input->args)->arg, strerror(errno));
+		if (get_content_from_fd(ARG(input->args), &content, &content_size) == ERROR)
 			return (ERROR);
-		}
-		if (fd == -1)
-		{
-			ft_printf("ft_ssl: md5: %s: %s\n", ARG(input->args)->arg, strerror(errno));
-			return (0);
-		}
 	}
-	md5_hash(hash, arg_content);
-	print_hash(hash, arg_content, input);
-	if (fd != 0)
-		ft_strdel(&arg_content);
+	md5_hash(hash, content, content_size);
+	print_hash(hash, content, content_size, input);
+	if (ARG(input->args)->type != TYPE_STRING)
+		ft_strdel(&content);
 	return (0);
 }
 
