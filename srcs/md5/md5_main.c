@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/16 15:49:52 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/18 16:45:01 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/19 10:52:46 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include "md5.h"
 #include "ft_fd.h"
 #include "ft_printf.h"
+#include "ft_put.h"
 #include "ft_queue.h"
 #include "ft_str.h"
 #include <errno.h>
@@ -23,60 +24,60 @@
 #include <string.h>
 #include <unistd.h>
 
-static void print_hash(char *hash, char *content, int content_size, struct s_input *input)
+static void print_hash(char *hash, char *data, struct s_input *input)
 {
 	if (ARG(input->args)->type == TYPE_STDIN)
 	{
-		if (input->opts & MD5_OP_P)
-			write(STDOUT_FD, content, content_size);
-		write(STDOUT_FD, hash, MD5_HASH_SIZE);
+		if (input->opts & (1 << MD5_OP_P))
+			ft_putendl(data);
+		ft_putendl(hash);
 	}
-	else if (input->opts & MD5_OP_Q)
-		write(STDOUT_FD, hash, MD5_HASH_SIZE);
+	else if (input->opts & (1 << MD5_OP_Q))
+		ft_putendl(hash);
 	else if (ARG(input->args)->type == TYPE_FILE)
 	{
-		if (input->opts & MD5_OP_R)
+		if (input->opts & (1 << MD5_OP_R))
 			ft_printf("%s %s\n", hash, ARG(input->args)->arg);
 		else
 			ft_printf("MD5(%s) = %s\n", ARG(input->args)->arg, hash);
 	}
 	else
 	{
-		if (input->opts & MD5_OP_R)
+		if (input->opts & (1 << MD5_OP_R))
 			ft_printf("%s \"%s\"\n", hash, ARG(input->args)->arg);
 		else
 			ft_printf("MD5(\"%s\") = %s\n", ARG(input->args)->arg, hash);
 	}
 }
 
-static int	read_file(int fd, char **content, int *content_size)
+static int	read_file(int fd, char **data, int *data_size)
 {
-	int		max_content_size;
+	int		max_data_size;
 	int		red;
 
-	max_content_size = 80;
-	*content = ft_strnew(max_content_size);
-	if (!*content)
+	max_data_size = 80;
+	*data = ft_strnew(max_data_size);
+	if (!*data)
 	{
 		write(STDOUT_FD, "failed to allocate\n", 19);
 		return (ERROR);
 	}
-	*content_size = 0;
+	*data_size = 0;
 	red = 1;
 	while (red > 0)
 	{
-		red = read(fd, *content + *content_size, 80);
-		*content_size = *content_size + red;
-		if (*content_size == max_content_size)
+		red = read(fd, *data + *data_size, 80);
+		*data_size = *data_size + red;
+		if (*data_size == max_data_size)
 		{
-			max_content_size = max_content_size * 2;
-			ft_stresize(content, 0, max_content_size);
+			max_data_size = max_data_size * 2;
+			ft_stresize(data, 0, max_data_size);
 		}
 	}
 	return (red);
 }
 
-static int	get_content_from_fd(struct s_arg *arg, char **content, int *content_size)
+static int	get_data_from_fd(struct s_arg *arg, char **data, int *data_size)
 {
 	int		fd;
 
@@ -91,7 +92,7 @@ static int	get_content_from_fd(struct s_arg *arg, char **content, int *content_s
 	}
 	else
 		fd = STDIN_FD;
-	if (read_file(fd, content, content_size) == -1)
+	if (read_file(fd, data, data_size) == -1)
 	{
 		ft_printf("ft_ssl: md5: %s\n", strerror(errno));
 		return (ERROR);
@@ -106,23 +107,25 @@ static int	get_content_from_fd(struct s_arg *arg, char **content, int *content_s
 
 static int	handle_argument(struct s_input *input)
 {
-	static char		hash[MD5_HASH_SIZE];
-	char			*content;
-	int				content_size;
+	char	*hash;
+	char	*data;
+	int		data_size;
 
-	content = 0;
-	content_size = 0;
+	data = 0;
+	data_size = 0;
 	if (ARG(input->args)->type == TYPE_STRING)
-		content = ARG(input->args)->arg;
+		data = ft_strdup(ARG(input->args)->arg);
 	else
 	{
-		if (get_content_from_fd(ARG(input->args), &content, &content_size) == ERROR)
+		if (get_data_from_fd(ARG(input->args), &data, &data_size) == ERROR)
 			return (ERROR);
 	}
-	md5_hash(hash, content, content_size);
-	print_hash(hash, content, content_size, input);
+	if (md5_hash(&hash, &data, data_size) == ERROR)
+		return (ERROR);
+	print_hash(hash, data, input);
 	if (ARG(input->args)->type != TYPE_STRING)
-		ft_strdel(&content);
+		ft_strdel(&data);
+	ft_strdel(&hash);
 	return (0);
 }
 

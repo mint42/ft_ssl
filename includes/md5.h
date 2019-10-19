@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 12:25:09 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/18 13:14:40 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/19 10:33:43 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,39 +19,23 @@
 # define B 1
 # define C 2
 # define D 3
+# define F 4
 
-struct				s_input;
+struct	s_input;
 
 /*
-**	MD5 struct
+**	MD5 reference
 **
-**	data[64]
-**		- Data is processed in chunks of 64 bytes (512 bits)
-**
-**	data_len_bytes
-**		- Length of data in bytes
-**
-**	data_len_bits[2]
-**		- Length of data in bits, if length is larger than 2^32 then only
-**			lowest 2 orders of the length are used
+**	block[64]
+**		- data is processed in blocks of 64 bytes (512 bits)
 **
 **	word[4]
 **		- 4 "word" buffers, each of size 32 bits, are used when transforming
 **			the data. Together they hold the total 128 bit message digest.
 **			They will be referenced as word[A], word[B], word[C], and word[D]
 **			with macros for A B C and D.
-*/
-
-struct				s_md5
-{
-	unsigned char	data[64];
-	unsigned int	data_len_bytes;
-	unsigned int	data_len_bits[2];
-	unsigned int	word[4];
-};
-
-/*
-**	MD5 flag options
+**
+**	flag options
 **
 **	-p,	echo STDIN to STDOUT and append the checksum to STDOUT
 **	-q, quiet mode
@@ -73,6 +57,10 @@ int		md5_main(int argc, char **argv);
 int		md5_get_options(int argc, char **argv, int *argv_index, struct s_input *input);
 int		md5_get_arguments(int argc, char **argv, int *argv_index, struct s_input *input);
 
-void	md5_hash(char *hash, char *content, int content_size);
+int		md5_hash(char **hash, char **data, int data_size);
+void	round0to15(unsigned int *tmp);
+void	round16to31(int i, unsigned int *tmp, int *chunk);
+void	round32to47(int i, unsigned int *tmp, int *chunk);
+void	round48to63(int i, unsigned int *tmp, int *chunk);
 
 #endif

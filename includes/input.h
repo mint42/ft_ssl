@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/16 13:09:48 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/17 12:49:54 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/19 10:06:57 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,12 @@
 
 # include <stdint.h>
 
-struct s_queue;
+typedef struct s_queue	t_queue;
 
-struct				s_input
+struct			s_input
 {
-	uint8_t			opts;
-	struct s_queue	*args;
+	uint8_t		opts;
+	t_queue		*args;
 };
 
 #endif

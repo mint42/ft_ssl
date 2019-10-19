@@ -6,14 +6,19 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:43:46 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/18 16:44:45 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/19 10:41:40 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "errors.h"
 #include "md5.h"
+#include "ft_mem.h"
+#include "ft_printf.h"
 #include "ft_str.h"
+#include <stdint.h>
 
-# define ROTATE(bits, rot) (((bits) << (rot)) | ((bits) >> (32 - (rot))));
+# define ROTATE(bits, rot) (((bits) << (rot)) | ((bits) >> (32 - (rot))))
+# define FLIP(bits) ((bits >> 24) | ((bits & 0xff0000) >> 8) | ((bits & 0xff00) << 8) | (bits << 24))
 
 /*
 **	NOTES
@@ -77,36 +82,36 @@ const uint32_t g_T[64] =
 	0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
 };
 
-static void	execute_round(int round, unsigned int *tmp, unsigned int *buff_chunks)
+static void	execute_round(int i, unsigned int *tmp, unsigned int *block_chunks)
 {
 	int				chunk;
 
 	chunk = 0;
-	if (round < 16)
-		rounds0to15(tmp, &chunk);
-	else if (round < 32)
-		rounds16to31(tmp, &chunk);
-	else if (round < 48)
-		rounds32to47(tmp, &chunk);
+	if (i < 16)
+		round0to15(tmp);
+	else if (i < 32)
+		round16to31(i, tmp, &chunk);
+	else if (i < 48)
+		round32to47(i, tmp, &chunk);
 	else
-		rounds48to63(words, &chunk);
-	tmp[F] = tmp[F] + tmp[A] + g_T[round] + buff_chunks[chunk];
+		round48to63(i, tmp, &chunk);
+	tmp[F] = tmp[F] + tmp[A] + g_T[i] + block_chunks[chunk];
 	tmp[A] = tmp[D];
 	tmp[D] = tmp[C];
 	tmp[C] = tmp[B];
-	tmp[B] = tmp[B] + ROTATE(tmp[F], g_rot[round]);
+	tmp[B] = tmp[B] + ROTATE(tmp[F], g_rot[i]);
 }
 
-static void	update_words(unsigned int *words, char *buff)
+static void	update_words(unsigned int *words, char *block)
 {
-	unsigned int	buff_chunks[16];
+	unsigned int	block_chunks[16];
 	unsigned int	tmp_words[5];
 	int				i;
 
 	i = 0;
 	while (i < 16)
 	{
-		ft_memcpy(buff_chunks[i], buff[i * 4], 4);
+		ft_memcpy((void *)&(block_chunks[i]), (void *)&block[i * 4], 4);
 		++i;
 	}
 	tmp_words[A] = words[A];
@@ -116,7 +121,7 @@ static void	update_words(unsigned int *words, char *buff)
 	i = 0;
 	while (i < 64)
 	{
-		execute_round(i, tmp_words, chunks);
+		execute_round(i, tmp_words, block_chunks);
 		++i;
 	}
 	words[A] = words[A] + tmp_words[A];
@@ -143,26 +148,27 @@ static int	pad_data(char **data, int *data_size)
 	int		padded_data_size;
 	int		bit_representation;
 
-	padded_data_size = data_size + 1;
+	padded_data_size = *data_size + 1;
 	while ((padded_data_size + 8) % 64)
 		++padded_data_size;
-	padded_data = ft_strnew(padded_data_size + 8); if (!padded_data)
+	padded_data = ft_strnew(padded_data_size + 8);
+	if (!padded_data)
 		return (ERROR);
-	ft_memcpy(padded_data, *data, data_size);
+	ft_memcpy(padded_data, *data, *data_size);
 	padded_data[*data_size] = (unsigned char)0x80;
-	bit_representation = data_size * 8;
+	bit_representation = *data_size * 8;
 	ft_memcpy(padded_data + padded_data_size, &bit_representation, 4);
+	*data_size = padded_data_size;
 	ft_strdel(data);
 	*data = padded_data;
-	*data_size = padded_data_size;
 	return (0);
 }
 
-void		md5_hash(char *hash, char **data, int data_size)
+int			md5_hash(char **hash, char **data, int data_size)
 {
-	char			buff[64];
-	unsigned int	words[4];
+	char			block[64];
 	int				data_processed;
+	unsigned int	words[4];
 
 	words[A] = 0x67452301;
 	words[B] = 0xefcdab89;
@@ -173,10 +179,10 @@ void		md5_hash(char *hash, char **data, int data_size)
 	data_processed = 0;
 	while (data_processed < data_size)
 	{
-		ft_memcpy(buff, *data + data_processed, 64);
-		update_words(words, buff);
+		ft_memcpy(block, *data + data_processed, 64);
+		update_words(words, block);
 		data_processed = data_processed + 64;
 	}
-	hash = ft_sprintf("%x%x%x%x", words[A], words[B], words[C], words[D]);
+	ft_sprintf(hash, "%x%x%x%x", words[A], words[B], words[C], words[D]);
 	return (0);
 }
