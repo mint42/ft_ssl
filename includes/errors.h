@@ -6,13 +6,15 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 12:44:02 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/17 12:44:17 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/19 12:13:03 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef ERRORS_H
 # define ERRORS_H
 
+# define SUCCESS 0
 # define ERROR 1
+# define E_BAD_ARG 2
 
 #endif

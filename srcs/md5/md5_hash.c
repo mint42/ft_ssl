@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:43:46 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/19 10:41:40 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/19 12:20:42 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,30 +142,28 @@ static void	update_words(unsigned int *words, char *block)
 **	a 64 bit (8 byte) long repsenation of the original data size.
 */
 
-static int	pad_data(char **data, int *data_size)
+static int	pad_data(char **padded_data, char *data, int *data_size)
 {
-	char	*padded_data;
 	int		padded_data_size;
 	int		bit_representation;
 
 	padded_data_size = *data_size + 1;
 	while ((padded_data_size + 8) % 64)
 		++padded_data_size;
-	padded_data = ft_strnew(padded_data_size + 8);
-	if (!padded_data)
+	*padded_data = ft_strnew(padded_data_size + 8);
+	if (!(*padded_data))
 		return (ERROR);
-	ft_memcpy(padded_data, *data, *data_size);
-	padded_data[*data_size] = (unsigned char)0x80;
+	ft_memcpy(*padded_data, data, *data_size);
+	(*padded_data)[*data_size] = (unsigned char)0x80;
 	bit_representation = *data_size * 8;
-	ft_memcpy(padded_data + padded_data_size, &bit_representation, 4);
+	ft_memcpy(*padded_data + padded_data_size, &bit_representation, 4);
 	*data_size = padded_data_size;
-	ft_strdel(data);
-	*data = padded_data;
 	return (0);
 }
 
-int			md5_hash(char **hash, char **data, int data_size)
+int			md5_hash(char **hash, char *data, int data_size)
 {
+	char			*padded_data;
 	char			block[64];
 	int				data_processed;
 	unsigned int	words[4];
@@ -174,15 +172,17 @@ int			md5_hash(char **hash, char **data, int data_size)
 	words[B] = 0xefcdab89;
 	words[C] = 0x98badcfe;
 	words[D] = 0x10325476;
-	if (pad_data(data, &data_size) == ERROR)
+	padded_data = 0;
+	if (pad_data(&padded_data, data, &data_size) == ERROR)
 		return (0);
 	data_processed = 0;
 	while (data_processed < data_size)
 	{
-		ft_memcpy(block, *data + data_processed, 64);
+		ft_memcpy(block, padded_data + data_processed, 64);
 		update_words(words, block);
 		data_processed = data_processed + 64;
 	}
 	ft_sprintf(hash, "%x%x%x%x", words[A], words[B], words[C], words[D]);
+	ft_strdel(&padded_data);
 	return (0);
 }

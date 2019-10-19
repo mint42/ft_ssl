@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:39:25 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/17 13:55:58 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/19 12:50:40 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,12 +36,11 @@ static int		enqueue_new_arg(int option, struct s_input *input, char **argv, int 
 			return (ERROR);
 		ft_enqueue(input->args, arg);
 	}
-	return (0);
+	return (SUCCESS);
 }
 
-static int		get_option(char *argv)
+static int		get_option(int *option, char *argv)
 {
-	int					option;
 	static const char	*valid_ops[MD5_TOTAL_VALID_OPS + 1] = {
 		"-p",
 		"-q",
@@ -50,14 +49,13 @@ static int		get_option(char *argv)
 		0,
 	};
 
-	option = 0;
-	while (option < MD5_TOTAL_VALID_OPS)
+	while (*option < MD5_TOTAL_VALID_OPS)
 	{
-		if (ft_strequ(valid_ops[option], argv))
-			return (option);
-		++option;
+		if (ft_strequ(valid_ops[*option], argv))
+			return (SUCCESS);
+		++(*option);
 	}
-	return (-1);
+	return (ERROR);
 }
 
 int				md5_get_options(int argc, char **argv, int *argv_index, struct s_input *input)
@@ -67,17 +65,16 @@ int				md5_get_options(int argc, char **argv, int *argv_index, struct s_input *i
 	option = 0;
 	while (*argv_index < argc && argv[*argv_index][0] == '-')
 	{
-		option = get_option(argv[*argv_index]);
-		if (option == -1)
+		if (get_option(&option, argv[*argv_index]) == ERROR)
 		{
-			ft_printf("ft_ssl: md5: '%s' is an invalid option", argv[*argv_index]);
+			ft_printf("ft_ssl: md5: '%s' is an invalid option\n", argv[*argv_index]);
 			ft_queue_del(&(input->args), ft_queue_del_content);
 			return (ERROR);
 		}
 		input->opts = (input->opts) | (1 << option);
-		if (option == (MD5_OP_P | MD5_OP_S))
+		if (option == (int)MD5_OP_P || option == (int)MD5_OP_S)
 			enqueue_new_arg(option, input, argv, argv_index);
 		++(*argv_index);
 	}
-	return (0);
+	return (SUCCESS);
 }

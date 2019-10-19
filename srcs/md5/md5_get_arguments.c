@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:39:37 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/17 15:11:52 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/19 12:10:56 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,5 +33,5 @@ int		md5_get_arguments(int argc, char **argv, int *argv_index, struct s_input *i
 			return (ERROR);
 		ft_enqueue(input->args, arg);
 	}
-	return (0);
+	return (SUCCESS);
 }

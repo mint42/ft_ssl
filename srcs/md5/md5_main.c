@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/16 15:49:52 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/19 10:52:46 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/19 12:27:13 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include "ft_printf.h"
 #include "ft_put.h"
 #include "ft_queue.h"
+#include "ft_mem.h"
 #include "ft_str.h"
 #include <errno.h>
 #include <fcntl.h>
@@ -29,7 +30,7 @@ static void print_hash(char *hash, char *data, struct s_input *input)
 	if (ARG(input->args)->type == TYPE_STDIN)
 	{
 		if (input->opts & (1 << MD5_OP_P))
-			ft_putendl(data);
+			ft_putstr(data);
 		ft_putendl(hash);
 	}
 	else if (input->opts & (1 << MD5_OP_Q))
@@ -39,14 +40,14 @@ static void print_hash(char *hash, char *data, struct s_input *input)
 		if (input->opts & (1 << MD5_OP_R))
 			ft_printf("%s %s\n", hash, ARG(input->args)->arg);
 		else
-			ft_printf("MD5(%s) = %s\n", ARG(input->args)->arg, hash);
+			ft_printf("MD5 (%s) = %s\n", ARG(input->args)->arg, hash);
 	}
 	else
 	{
 		if (input->opts & (1 << MD5_OP_R))
 			ft_printf("%s \"%s\"\n", hash, ARG(input->args)->arg);
 		else
-			ft_printf("MD5(\"%s\") = %s\n", ARG(input->args)->arg, hash);
+			ft_printf("MD5 (\"%s\") = %s\n", ARG(input->args)->arg, hash);
 	}
 }
 
@@ -58,10 +59,7 @@ static int	read_file(int fd, char **data, int *data_size)
 	max_data_size = 80;
 	*data = ft_strnew(max_data_size);
 	if (!*data)
-	{
-		write(STDOUT_FD, "failed to allocate\n", 19);
 		return (ERROR);
-	}
 	*data_size = 0;
 	red = 1;
 	while (red > 0)
@@ -87,7 +85,7 @@ static int	get_data_from_fd(struct s_arg *arg, char **data, int *data_size)
 		if (fd == -1)
 		{
 			ft_printf("ft_ssl: md5: %s: %s\n", arg->arg, strerror(errno));
-			return (ERROR);
+			return (E_BAD_ARG);
 		}
 	}
 	else
@@ -95,14 +93,14 @@ static int	get_data_from_fd(struct s_arg *arg, char **data, int *data_size)
 	if (read_file(fd, data, data_size) == -1)
 	{
 		ft_printf("ft_ssl: md5: %s\n", strerror(errno));
-		return (ERROR);
+		return (E_BAD_ARG);
 	}
 	if (close(fd) == -1)
 	{
 		ft_printf("ft_ssl: md5: %s: %s\n", arg->arg, strerror(errno));
-		return (ERROR);
+		return (E_BAD_ARG);
 	}
-	return (0);
+	return (SUCCESS);
 }
 
 static int	handle_argument(struct s_input *input)
@@ -110,6 +108,7 @@ static int	handle_argument(struct s_input *input)
 	char	*hash;
 	char	*data;
 	int		data_size;
+	int		exit_code;
 
 	data = 0;
 	data_size = 0;
@@ -117,16 +116,19 @@ static int	handle_argument(struct s_input *input)
 		data = ft_strdup(ARG(input->args)->arg);
 	else
 	{
-		if (get_data_from_fd(ARG(input->args), &data, &data_size) == ERROR)
+		exit_code = get_data_from_fd(ARG(input->args), &data, &data_size);
+		if (exit_code == ERROR)
 			return (ERROR);
+		if (exit_code == E_BAD_ARG)
+			return (SUCCESS);
 	}
-	if (md5_hash(&hash, &data, data_size) == ERROR)
+	if (md5_hash(&hash, data, data_size) == ERROR)
 		return (ERROR);
 	print_hash(hash, data, input);
 	if (ARG(input->args)->type != TYPE_STRING)
 		ft_strdel(&data);
 	ft_strdel(&hash);
-	return (0);
+	return (SUCCESS);
 }
 
 int		md5_main(int argc, char **argv)
@@ -145,11 +147,11 @@ int		md5_main(int argc, char **argv)
 	{
 		if (handle_argument(&input) == ERROR)
 		{
-			ft_queue_del(&(input.args), ft_queue_del_content);
+			ft_queue_del(&(input.args), 0);
 			return (ERROR);
 		}
 		ft_dequeue(input.args);
 	}
 	ft_queue_del(&(input.args), ft_queue_del_content);
-	return (0);
+	return (SUCCESS);
 }
