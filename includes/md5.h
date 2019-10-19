@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 12:25:09 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/19 12:20:27 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/19 13:51:43 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ int		md5_get_options(int argc, char **argv, int *argv_index, struct s_input *inp
 int		md5_get_arguments(int argc, char **argv, int *argv_index, struct s_input *input);
 
 int		md5_hash(char **hash, char *data, int data_size);
-void	round0to15(unsigned int *tmp);
+void	round0to15(int i, unsigned int *tmp, int *chunk);
 void	round16to31(int i, unsigned int *tmp, int *chunk);
 void	round32to47(int i, unsigned int *tmp, int *chunk);
 void	round48to63(int i, unsigned int *tmp, int *chunk);

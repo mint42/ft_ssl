@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:43:46 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/19 12:20:42 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/19 13:52:58 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ static void	execute_round(int i, unsigned int *tmp, unsigned int *block_chunks)
 
 	chunk = 0;
 	if (i < 16)
-		round0to15(tmp);
+		round0to15(i, tmp, &chunk);
 	else if (i < 32)
 		round16to31(i, tmp, &chunk);
 	else if (i < 48)
@@ -147,19 +147,21 @@ static int	pad_data(char **padded_data, char *data, int *data_size)
 	int		padded_data_size;
 	int		bit_representation;
 
-	padded_data_size = *data_size + 1;
-	while ((padded_data_size + 8) % 64)
+	padded_data_size = *data_size + 9;
+	while ((padded_data_size) % 64)
 		++padded_data_size;
-	*padded_data = ft_strnew(padded_data_size + 8);
+	*padded_data = ft_strnew(padded_data_size);
 	if (!(*padded_data))
 		return (ERROR);
 	ft_memcpy(*padded_data, data, *data_size);
-	(*padded_data)[*data_size] = (unsigned char)0x80;
+	(*padded_data)[*data_size] = (unsigned char)128;
 	bit_representation = *data_size * 8;
-	ft_memcpy(*padded_data + padded_data_size, &bit_representation, 4);
+	ft_memcpy(*padded_data + padded_data_size - 8, &bit_representation, 4);
 	*data_size = padded_data_size;
 	return (0);
 }
+
+#include <unistd.h>
 
 int			md5_hash(char **hash, char *data, int data_size)
 {
@@ -182,7 +184,7 @@ int			md5_hash(char **hash, char *data, int data_size)
 		update_words(words, block);
 		data_processed = data_processed + 64;
 	}
-	ft_sprintf(hash, "%x%x%x%x", words[A], words[B], words[C], words[D]);
+	ft_sprintf(hash, "%x%x%x%x", FLIP(words[A]), FLIP(words[B]), FLIP(words[C]), FLIP(words[D]));
 	ft_strdel(&padded_data);
 	return (0);
 }

@@ -6,15 +6,16 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/18 16:34:28 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/19 09:50:29 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/19 13:52:01 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "md5.h"
 
-void	round0to15(unsigned int *tmp)
+void	round0to15(int i, unsigned int *tmp, int *chunk)
 {
 	tmp[F] = ((tmp[B] & tmp[C]) | (~tmp[B] & tmp[D]));
+	*chunk = i;
 }
 
 void	round16to31(int i, unsigned int *tmp, int *chunk)
