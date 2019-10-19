@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 17:03:00 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/17 17:05:17 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/19 16:12:15 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,106 +24,110 @@
 #include <string.h>
 #include <unistd.h>
 
-static void print_hash(char *hash, char *arg_content, struct s_input *input)
+static void print_hash(char *hash, char *data, struct s_input *input)
 {
 	if (ARG(input->args)->type == TYPE_STDIN)
 	{
-		if (input->opts & SHA256_OP_P)
-			ft_putendl(arg_content);
+		if (input->opts & (1 << SHA256_OP_P))
+			ft_putstr(data);
 		ft_putendl(hash);
 	}
-	else if (input->opts & SHA256_OP_Q)
+	else if (input->opts & (1 << SHA256_OP_Q))
 		ft_putendl(hash);
 	else if (ARG(input->args)->type == TYPE_FILE)
 	{
-		if (input->opts & SHA256_OP_R)
+		if (input->opts & (1 << SHA256_OP_R))
 			ft_printf("%s %s\n", hash, ARG(input->args)->arg);
 		else
-			ft_printf("SHA256(%s) = %s\n", ARG(input->args)->arg, hash);
+			ft_printf("SHA256 (%s) = %s\n", ARG(input->args)->arg, hash);
 	}
 	else
 	{
-		if (input->opts & SHA256_OP_R)
+		if (input->opts & (1 << SHA256_OP_R))
 			ft_printf("%s \"%s\"\n", hash, ARG(input->args)->arg);
 		else
-			ft_printf("SHA256(\"%s\") = %s\n", ARG(input->args)->arg, hash);
+			ft_printf("SHA256 (\"%s\") = %s\n", ARG(input->args)->arg, hash);
 	}
 }
 
-static int	get_file(int fd, char **content)
+static int	read_file(int fd, char **data, int *data_size)
 {
-	int		content_size;
-	int		total_red;
+	int		max_data_size;
 	int		red;
 
-	content_size = 80;
-	*content = ft_strnew(content_size);
-	if (!*content)
-	{
-		write(STDOUT_FD, "failed to allocate\n", 19);
+	max_data_size = 80;
+	*data = ft_strnew(max_data_size);
+	if (!*data)
 		return (ERROR);
-	}
-	total_red = 0;
+	*data_size = 0;
 	red = 1;
 	while (red > 0)
 	{
-		red = read(fd, (*content) + total_red, 80);
-		total_red = total_red + red;
-		if (total_red == content_size)
+		red = read(fd, *data + *data_size, 80);
+		*data_size = *data_size + red;
+		if (*data_size == max_data_size)
 		{
-			content_size = content_size * 2;
-			ft_stresize(content, 0, content_size);
+			max_data_size = max_data_size * 2;
+			ft_stresize(data, 0, max_data_size);
 		}
 	}
-	return (0);
+	return (red);
 }
 
-static int	get_content_from_fd(struct s_arg *arg, char **arg_content, int *fd)
+static int	get_data_from_fd(struct s_arg *arg, char **data, int *data_size)
 {
+	int		fd;
+
 	if (arg->type == TYPE_FILE)
-		*fd = open(arg->arg, O_RDONLY);
-	else
-		*fd = STDIN_FD;
-	if (*fd == -1)
-		return (ERROR);
-	if (get_file(*fd, arg_content) == ERROR)
 	{
-		write(STDOUT_FD, "failed to get file\n", 20);
-		return (ERROR);
+		fd = open(arg->arg, O_RDONLY);
+		if (fd == -1)
+		{
+			ft_printf("ft_ssl: sha256: %s: %s\n", arg->arg, strerror(errno));
+			return (E_BAD_ARG);
+		}
 	}
-	if (close(*fd) == -1)
-		return (ERROR);
-	return (0);
+	else
+		fd = STDIN_FD;
+	if (read_file(fd, data, data_size) == -1)
+	{
+		ft_printf("ft_ssl: sha256: %s\n", strerror(errno));
+		return (E_BAD_ARG);
+	}
+	if (close(fd) == -1)
+	{
+		ft_printf("ft_ssl: sha256: %s: %s\n", arg->arg, strerror(errno));
+		return (E_BAD_ARG);
+	}
+	return (SUCCESS);
 }
 
 static int	handle_argument(struct s_input *input)
 {
-	static char		hash[SHA256_HASH_SIZE];
-	char			*arg_content;
-	int				fd;
+	char	*hash;
+	char	*data;
+	int		data_size;
+	int		exit_code;
 
-	fd = 0;
-	arg_content = 0;
+	data = 0;
+	data_size = 0;
 	if (ARG(input->args)->type == TYPE_STRING)
-		arg_content = ARG(input->args)->arg;
+		data = ft_strdup(ARG(input->args)->arg);
 	else
 	{
-		if (get_content_from_fd(ARG(input->args), &arg_content, &fd) == ERROR)
-		{
-			ft_printf("ft_ssl: sha256: %s: %s\n", ARG(input->args)->arg, strerror(errno));
+		exit_code = get_data_from_fd(ARG(input->args), &data, &data_size);
+		if (exit_code == ERROR)
 			return (ERROR);
-		}
-		if (fd == -1)
-		{
-			ft_printf("ft_ssl: sha256: %s: %s\n", ARG(input->args)->arg, strerror(errno));
-			return (0);
-		}
+		if (exit_code == E_BAD_ARG)
+			return (SUCCESS);
 	}
-	sha256_hash(hash, arg_content);
-	print_hash(hash, arg_content, input);
-	if (fd != 0)
-		ft_strdel(&arg_content);
-	return (0);
+	if (sha256_hash(&hash, data, data_size) == ERROR)
+		return (ERROR);
+	print_hash(hash, data, input);
+	if (ARG(input->args)->type != TYPE_STRING)
+		ft_strdel(&data);
+	ft_strdel(&hash);
+	return (SUCCESS);
 }
 
 int		sha256_main(int argc, char **argv)
@@ -142,11 +146,11 @@ int		sha256_main(int argc, char **argv)
 	{
 		if (handle_argument(&input) == ERROR)
 		{
-			ft_queue_del(&(input.args), ft_queue_del_content);
+			ft_queue_del(&(input.args), 0);
 			return (ERROR);
 		}
 		ft_dequeue(input.args);
 	}
 	ft_queue_del(&(input.args), ft_queue_del_content);
-	return (0);
+	return (SUCCESS);
 }

@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 12:25:09 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/19 13:51:43 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/19 16:00:56 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,6 @@
 # define MD5_H
 
 # define MD5_HASH_SIZE 128
-
-# define A 0
-# define B 1
-# define C 2
-# define D 3
-# define F 4
 
 struct	s_input;
 

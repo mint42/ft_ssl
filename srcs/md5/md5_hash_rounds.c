@@ -6,11 +6,16 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/18 16:34:28 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/19 13:52:01 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/19 16:02:17 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "md5.h"
+#include "md5.h"
+
+#define B 1
+#define C 2
+#define D 3
+#define F 4
 
 void	round0to15(int i, unsigned int *tmp, int *chunk)
 {

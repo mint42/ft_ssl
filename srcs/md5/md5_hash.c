@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:43:46 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/19 13:52:58 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/19 16:02:01 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,13 @@
 #include "ft_str.h"
 #include <stdint.h>
 
-# define ROTATE(bits, rot) (((bits) << (rot)) | ((bits) >> (32 - (rot))))
-# define FLIP(bits) ((bits >> 24) | ((bits & 0xff0000) >> 8) | ((bits & 0xff00) << 8) | (bits << 24))
+#define LROT(bits, rot) (((bits) << (rot)) | ((bits) >> (32 - (rot))))
+#define FLIP(bits) ((bits >> 24) | ((bits & 0xff0000) >> 8) | ((bits & 0xff00) << 8) | (bits << 24))
+#define A 0
+#define B 1
+#define C 2
+#define D 3
+#define F 4
 
 /*
 **	NOTES
@@ -62,7 +67,7 @@ const uint32_t g_rot[64] =
 **	Where the value of i (1 through 64) is in radians.
 */
 
-const uint32_t g_T[64] =
+const uint32_t g_k[64] =
 {
 	0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
 	0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
@@ -95,14 +100,14 @@ static void	execute_round(int i, unsigned int *tmp, unsigned int *block_chunks)
 		round32to47(i, tmp, &chunk);
 	else
 		round48to63(i, tmp, &chunk);
-	tmp[F] = tmp[F] + tmp[A] + g_T[i] + block_chunks[chunk];
+	tmp[F] = tmp[F] + tmp[A] + g_k[i] + block_chunks[chunk];
 	tmp[A] = tmp[D];
 	tmp[D] = tmp[C];
 	tmp[C] = tmp[B];
-	tmp[B] = tmp[B] + ROTATE(tmp[F], g_rot[i]);
+	tmp[B] = tmp[B] + LROT(tmp[F], g_rot[i]);
 }
 
-static void	update_words(unsigned int *words, char *block)
+static void	process_block(unsigned int *words, char *block)
 {
 	unsigned int	block_chunks[16];
 	unsigned int	tmp_words[5];
@@ -158,10 +163,8 @@ static int	pad_data(char **padded_data, char *data, int *data_size)
 	bit_representation = *data_size * 8;
 	ft_memcpy(*padded_data + padded_data_size - 8, &bit_representation, 4);
 	*data_size = padded_data_size;
-	return (0);
+	return (SUCCESS);
 }
-
-#include <unistd.h>
 
 int			md5_hash(char **hash, char *data, int data_size)
 {
@@ -176,15 +179,15 @@ int			md5_hash(char **hash, char *data, int data_size)
 	words[D] = 0x10325476;
 	padded_data = 0;
 	if (pad_data(&padded_data, data, &data_size) == ERROR)
-		return (0);
+		return (ERROR);
 	data_processed = 0;
 	while (data_processed < data_size)
 	{
 		ft_memcpy(block, padded_data + data_processed, 64);
-		update_words(words, block);
+		process_block(words, block);
 		data_processed = data_processed + 64;
 	}
 	ft_sprintf(hash, "%x%x%x%x", FLIP(words[A]), FLIP(words[B]), FLIP(words[C]), FLIP(words[D]));
 	ft_strdel(&padded_data);
-	return (0);
+	return (SUCCESS);
 }
