@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   sha256_hash.c                                      :+:      :+:    :+:   */
+/*   sha224_hash.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 13:48:10 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/20 04:20:41 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/20 04:20:19 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "errors.h"
-#include "sha256.h"
+#include "sha224.h"
 #include "ft_mem.h"
 #include "ft_printf.h"
 #include "ft_str.h"
@@ -37,7 +37,7 @@
 # define G 14
 # define H 15
 
-const uint32_t	g_k256[64] =
+const uint32_t	g_k224[64] =
 {
    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
    0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -63,7 +63,7 @@ static void	execute_round(int i, unsigned int *word, unsigned int *w)
 
 	tmp[0] = RROT(word[E], 6) ^ RROT(word[E], 11) ^ RROT(word[E], 25);
 	tmp[1] = (word[E] & word[F]) ^ (~word[E] & word[G]);
-	tmp[2] = word[H] + tmp[0] + tmp[1] + g_k256[i] + w[i];
+	tmp[2] = word[H] + tmp[0] + tmp[1] + g_k224[i] + w[i];
 	tmp[3] = RROT(word[A], 2) ^ RROT(word[A], 13) ^ RROT(word[A], 22);
 	tmp[4] = (word[A] & word[B]) ^ (word[A] & word[C]) ^ (word[B] & word[C]);
 	tmp[5] = tmp[3] + tmp[4];
@@ -150,14 +150,14 @@ static int	pad_data(char **padded_data, char *data, int *data_size)
 	return (SUCCESS);
 }
 
-int			sha256_hash(char **hash, char *data, int data_size)
+int			sha224_hash(char **hash, char *data, int data_size)
 {
 	char			*padded_data;
 	char			block[64];
 	unsigned int	word[16];
 	int				data_processed;
 
-	sha256_init_words(word);
+	sha224_init_words(word);
 	padded_data = 0;
 	if (pad_data(&padded_data, data, &data_size) == ERROR)
 		return (ERROR);
@@ -168,8 +168,8 @@ int			sha256_hash(char **hash, char *data, int data_size)
 		process_block(word, block);
 		data_processed = data_processed + 64;
 	}
-	ft_sprintf(hash, "%08x%08x%08x%08x%08x%08x%08x%08x", word[A_O], word[B_O],
-		word[C_O], word[D_O], word[E_O], word[F_O], word[G_O], word[H_O]);
+	ft_sprintf(hash, "%08x%08x%08x%08x%08x%08x%08x", word[A_O], word[B_O],
+		word[C_O], word[D_O], word[E_O], word[F_O], word[G_O]);
 	ft_strdel(&padded_data);
 	return (SUCCESS);
 }

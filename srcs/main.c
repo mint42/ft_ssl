@@ -6,12 +6,13 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/16 12:02:51 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/17 15:00:12 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/20 04:10:47 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "errors.h"
 #include "md5.h"
+#include "sha224.h"
 #include "sha256.h"
 #include "ssl.h"
 #include "ft_fd.h"
@@ -23,6 +24,7 @@ static int		execute_command(int command, int argc, char **argv)
 {
 	static int		(*command_table[TOTAL_VALID_COMMANDS])() = {
 		md5_main,
+		sha224_main,
 		sha256_main,
 	};
 
@@ -34,6 +36,7 @@ static int		get_command(char *argv)
 	int					command;
 	static const char	*valid_commands[TOTAL_VALID_COMMANDS + 1] = {
 		"md5",
+		"sha224",
 		"sha256",
 		0,
 	};

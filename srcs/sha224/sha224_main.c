@@ -1,24 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   md5_main.c                                         :+:      :+:    :+:   */
+/*   sha224_main.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/16 15:49:52 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/20 04:58:48 by rreedy           ###   ########.fr       */
+/*   Created: 2019/10/17 17:03:00 by rreedy            #+#    #+#             */
+/*   Updated: 2019/10/20 05:00:22 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "arg.h"
 #include "errors.h"
 #include "input.h"
-#include "md5.h"
+#include "sha224.h"
 #include "ft_fd.h"
 #include "ft_printf.h"
 #include "ft_put.h"
 #include "ft_queue.h"
-#include "ft_mem.h"
 #include "ft_str.h"
 #include <errno.h>
 #include <fcntl.h>
@@ -29,25 +28,25 @@ static void print_hash(char *hash, char *data, struct s_input *input)
 {
 	if (ARG(input->args)->type == TYPE_STDIN)
 	{
-		if (input->opts & (1 << MD5_OP_P))
+		if (input->opts & (1 << SHA224_OP_P))
 			ft_putstr(data);
 		ft_putendl(hash);
 	}
-	else if (input->opts & (1 << MD5_OP_Q))
+	else if (input->opts & (1 << SHA224_OP_Q))
 		ft_putendl(hash);
 	else if (ARG(input->args)->type == TYPE_FILE)
 	{
-		if (input->opts & (1 << MD5_OP_R))
+		if (input->opts & (1 << SHA224_OP_R))
 			ft_printf("%s %s\n", hash, ARG(input->args)->arg);
 		else
-			ft_printf("MD5 (%s) = %s\n", ARG(input->args)->arg, hash);
+			ft_printf("SHA224 (%s) = %s\n", ARG(input->args)->arg, hash);
 	}
 	else
 	{
-		if (input->opts & (1 << MD5_OP_R))
+		if (input->opts & (1 << SHA224_OP_R))
 			ft_printf("%s \"%s\"\n", hash, ARG(input->args)->arg);
 		else
-			ft_printf("MD5 (\"%s\") = %s\n", ARG(input->args)->arg, hash);
+			ft_printf("SHA224 (\"%s\") = %s\n", ARG(input->args)->arg, hash);
 	}
 }
 
@@ -84,7 +83,7 @@ static int	get_data_from_fd(struct s_arg *arg, char **data, int *data_size)
 		fd = open(arg->arg, O_RDONLY);
 		if (fd == -1)
 		{
-			ft_printf("ft_ssl: md5: %s: %s\n", arg->arg, strerror(errno));
+			ft_printf("ft_ssl: sha224: %s: %s\n", arg->arg, strerror(errno));
 			return (E_BAD_ARG);
 		}
 	}
@@ -92,12 +91,12 @@ static int	get_data_from_fd(struct s_arg *arg, char **data, int *data_size)
 		fd = STDIN_FD;
 	if (read_file(fd, data, data_size) == -1)
 	{
-		ft_printf("ft_ssl: md5: %s\n", strerror(errno));
+		ft_printf("ft_ssl: sha224: %s\n", strerror(errno));
 		return (E_BAD_ARG);
 	}
 	if (close(fd) == -1)
 	{
-		ft_printf("ft_ssl: md5: %s: %s\n", arg->arg, strerror(errno));
+		ft_printf("ft_ssl: sha224: %s: %s\n", arg->arg, strerror(errno));
 		return (E_BAD_ARG);
 	}
 	return (SUCCESS);
@@ -122,7 +121,7 @@ static int	handle_argument(struct s_input *input)
 		if (exit_code == E_BAD_ARG)
 			return (SUCCESS);
 	}
-	if (md5_hash(&hash, data, data_size) == ERROR)
+	if (sha224_hash(&hash, data, data_size) == ERROR)
 		return (ERROR);
 	print_hash(hash, data, input);
 	if (ARG(input->args)->type != TYPE_STRING)
@@ -131,7 +130,7 @@ static int	handle_argument(struct s_input *input)
 	return (SUCCESS);
 }
 
-int		md5_main(int argc, char **argv)
+int		sha224_main(int argc, char **argv)
 {
 	struct s_input	input;
 	int				argv_index;
@@ -139,9 +138,9 @@ int		md5_main(int argc, char **argv)
 	input.opts = 0;
 	input.args = ft_queue_init();
 	argv_index = 2;
-	if (md5_get_options(argc, argv, &argv_index, &input) == ERROR)
+	if (sha224_get_options(argc, argv, &argv_index, &input) == ERROR)
 		return (ERROR);
-	if (md5_get_arguments(argc, argv, &argv_index, &input) == ERROR)
+	if (sha224_get_arguments(argc, argv, &argv_index, &input) == ERROR)
 		return (ERROR);
 	while ((input.args)->first)
 	{

@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 17:03:00 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/19 16:12:15 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/20 05:00:02 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ static int	read_file(int fd, char **data, int *data_size)
 		if (*data_size == max_data_size)
 		{
 			max_data_size = max_data_size * 2;
-			ft_stresize(data, 0, max_data_size);
+			*data = ft_stresize(data, 0, max_data_size);
 		}
 	}
 	return (red);
