@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 13:48:10 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/19 16:12:57 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/20 02:23:33 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include "ft_str.h"
 #include <stdint.h>
 
-#define RROT(bits, rot) ((bits >> rot) | (bits << (32 - rot)))
+#define RROT(bits, rot) (((unsigned int)(bits >> rot)) | (bits << (32 - rot)))
 #define FLIP(bits) ((bits >> 24) | ((bits & 0xff0000) >> 8) | ((bits & 0xff00) << 8) | (bits << 24))
 
 # define A_O 0
@@ -57,22 +57,24 @@ const uint32_t	g_k2[64] =
    0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
 
-static void	execute_round(unsigned int *word, unsigned int *tmp, unsigned int *w, int i)
+static void	execute_round(int i, unsigned int *word, unsigned int *w)
 {
+	unsigned int	tmp[6];
+
 	tmp[0] = RROT(word[E], 6) ^ RROT(word[E], 11) ^ RROT(word[E], 25);
 	tmp[1] = (word[E] & word[F]) ^ (~word[E] & word[G]);
-	tmp[2] = word[H] + tmp[1] + tmp[2] + g_k2[i] + w[i];
+	tmp[2] = word[H] + tmp[0] + tmp[1] + g_k2[i] + w[i];
 	tmp[3] = RROT(word[A], 2) ^ RROT(word[A], 13) ^ RROT(word[A], 22);
 	tmp[4] = (word[A] & word[B]) ^ (word[A] & word[C]) ^ (word[B] & word[C]);
-	tmp[5] = tmp[4] + tmp[5];
+	tmp[5] = tmp[3] + tmp[4];
 	word[H] = word[G];
 	word[G] = word[F];
 	word[F] = word[E];
-	word[E] = word[D] + tmp[1];
+	word[E] = word[D] + tmp[2];
 	word[D] = word[C];
 	word[C] = word[B];
 	word[B] = word[A];
-	word[A] = tmp[1] + tmp[2];
+	word[A] = tmp[2] + tmp[5];
 }
 
 static void	build_w(unsigned int *w, char *block)
@@ -82,7 +84,7 @@ static void	build_w(unsigned int *w, char *block)
 	int				i;
 
 	ft_memcpy(w, block, 64);
-	i = 0;
+	i = 16;
 	while (i < 64)
 	{
 		tmp1 = RROT(w[i - 15], 7) ^ RROT(w[i - 15], 18) ^ (w[i - 15] >> 3);
@@ -95,7 +97,6 @@ static void	build_w(unsigned int *w, char *block)
 static void	process_block(unsigned int *word, char *block)
 {
 	unsigned int	w[64];
-	uint32_t		tmp[6];
 	int				i;
 
 	build_w(w, block);
@@ -108,8 +109,11 @@ static void	process_block(unsigned int *word, char *block)
 	word[G] = word[G_O];
 	word[H] = word[H_O];
 	i = 0;
-	while (i++ < 64)
-		execute_round(word, tmp, w, i);
+	while (i < 64)
+	{	
+		execute_round(i, word, w);
+		++i;
+	}
 	word[A_O] = word[A_O] + word[A];
 	word[B_O] = word[B_O] + word[B];
 	word[C_O] = word[C_O] + word[C];
@@ -136,9 +140,9 @@ static int	pad_data(char **padded_data, char *data, int *data_size)
 	(*padded_data)[*data_size] = (unsigned char)128;
 	bit_representation = *data_size * 8;
 	i = 0;
-	while (i < (padded_data_size - 8) / 4)
+	while (i < ((padded_data_size - 8) / 4))
 	{
-		(*padded_data)[i] = FLIP((*padded_data)[i]);
+		((unsigned int *)(*padded_data))[i] = FLIP(((unsigned int *)(*padded_data))[i]);
 		++i;
 	}
 	ft_memcpy(*padded_data + padded_data_size - 4, &bit_representation, 4);
@@ -166,6 +170,7 @@ int			sha256_hash(char **hash, char *data, int data_size)
 	int				data_processed;
 
 	init_words(word);
+	padded_data = 0;
 	if (pad_data(&padded_data, data, &data_size) == ERROR)
 		return (ERROR);
 	data_processed = 0;
@@ -175,9 +180,8 @@ int			sha256_hash(char **hash, char *data, int data_size)
 		process_block(word, block);
 		data_processed = data_processed + 64;
 	}
-	ft_sprintf(hash, "%x%x%x%x%x%x%x%x", FLIP(word[A_O]), FLIP(word[B_O]),
-			FLIP(word[C_O]), FLIP(word[D_O]), FLIP(word[E_O]),
-			FLIP(word[F_O]), FLIP(word[G_O]), FLIP(word[H_O]));
+	ft_sprintf(hash, "%08x%08x%08x%08x%08x%08x%08x%08x", word[A_O], word[B_O],
+		word[C_O], word[D_O], word[E_O], word[F_O], word[G_O], word[H_O]);
 	ft_strdel(&padded_data);
 	return (SUCCESS);
 }

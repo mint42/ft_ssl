@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:43:46 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/19 16:02:01 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/20 02:24:13 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -187,7 +187,8 @@ int			md5_hash(char **hash, char *data, int data_size)
 		process_block(words, block);
 		data_processed = data_processed + 64;
 	}
-	ft_sprintf(hash, "%x%x%x%x", FLIP(words[A]), FLIP(words[B]), FLIP(words[C]), FLIP(words[D]));
+	ft_sprintf(hash, "%08x%08x%08x%08x", FLIP(words[A]), FLIP(words[B]),
+		FLIP(words[C]), FLIP(words[D]));
 	ft_strdel(&padded_data);
 	return (SUCCESS);
 }
