@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:38:54 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/20 04:00:39 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/20 12:24:10 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,11 +50,11 @@ static int		get_option(int *option, char *argv)
 	};
 
 	*option = 0;
-	while ((*option) < SHA256_TOTAL_VALID_OPS)
+	while (*option < SHA256_TOTAL_VALID_OPS)
 	{
 		if (ft_strequ(valid_ops[*option], argv))
 			return (SUCCESS);
-		++option;
+		++(*option);
 	}
 	return (ERROR);
 }
@@ -73,7 +73,7 @@ int				sha256_get_options(int argc, char **argv, int *argv_index, struct s_input
 			return (ERROR);
 		}
 		input->opts = (input->opts) | (1 << option);
-		if (option == (SHA256_OP_P | SHA256_OP_S))
+		if (option == (int)SHA256_OP_P || option == (int)SHA256_OP_S)
 			enqueue_new_arg(option, input, argv, argv_index);
 		++(*argv_index);
 	}
