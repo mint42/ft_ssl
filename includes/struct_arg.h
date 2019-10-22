@@ -1,26 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   input.h                                            :+:      :+:    :+:   */
+/*   arg.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/16 13:09:48 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/19 10:06:57 by rreedy           ###   ########.fr       */
+/*   Created: 2019/10/16 14:58:00 by rreedy            #+#    #+#             */
+/*   Updated: 2019/10/22 13:00:59 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef INPUT_H
-# define INPUT_H
+#ifndef ARG_H
+# define ARG_H
 
 # include <stdint.h>
 
-typedef struct s_queue	t_queue;
+# define TYPE_STDIN 1
+# define TYPE_STRING 2
+# define TYPE_FILE 3
 
-struct			s_input
+# define ARG(args) ((struct s_arg *)((args)->first->content))
+
+struct			s_arg
 {
-	uint8_t		opts;
-	t_queue		*args;
+	char		*arg;
+	uint8_t		type;
 };
+
+int		init_arg(struct s_arg **arg, char *string, int type);
 
 #endif

@@ -1,27 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ssl.h                                              :+:      :+:    :+:   */
+/*   md5_options.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/17 12:30:24 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 11:00:34 by rreedy           ###   ########.fr       */
+/*   Created: 2019/10/22 11:01:52 by rreedy            #+#    #+#             */
+/*   Updated: 2019/10/22 12:10:22 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SSL_H
-# define SSL_H
-
-# define TOTAL_VALID_COMMANDS 4
+#ifndef MD5_OPTIONS_H
+# define MD5_OPTIONS_H
 
 /*
-**	enum	e_commands
-**	{
-**		MD5 = 0,
-**		SHA256,
-**		TOTAL_COMMANDS,
-**	};
+**	options
+**
+**	-p,	echo STDIN to STDOUT and append the checksum to STDOUT
+**	-q, quiet mode
+**	-r, reverse the format of the output
+**	-s, print the sum of the given string
+**
 */
+
+enum	e_ops
+{
+		OP_P = 0,
+		OP_Q,
+		OP_R,
+		OP_S,
+		TOTAL_VALID_OPS,
+};
 
 #endif
