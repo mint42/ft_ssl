@@ -6,68 +6,25 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:43:46 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/20 02:24:13 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 13:30:30 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "errors.h"
 #include "md5.h"
+#include "md5_macros.h"
 #include "ft_mem.h"
 #include "ft_printf.h"
-#include "ft_str.h"
 #include <stdint.h>
 
-#define LROT(bits, rot) (((bits) << (rot)) | ((bits) >> (32 - (rot))))
-#define FLIP(bits) ((bits >> 24) | ((bits & 0xff0000) >> 8) | ((bits & 0xff00) << 8) | (bits << 24))
-#define A 0
-#define B 1
-#define C 2
-#define D 3
-#define F 4
-
 /*
-**	NOTES
-**
-**	four main functions:
-**
-**		init -- init_md5()
-**			initalize the md5 struct
-**			datalen = 0;
-**			bitlen[0] = 0;
-**			bitlen[1] = 0;
-**				these are in BIG endian?? supposedly
-**			
-**		update -- fill_data_buffer()
-**			copies data into the md5 struct
-**			
-**		final -- pad_remaining_data()
-**			padding and adding the bitlen[] to the end of data[]
-**		
-**		transform -- transform_data()
-**			takes the md5 struct does the thing to ABCD buffers
-*/
-
-/*
-** This table is used to figure out how far left you rotate the buffer each round
-*/
-
-const uint32_t g_rot[64] =
-{
-	7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12,
-	17, 22, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 4, 11, 16,
-	23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 6, 10, 15, 21, 6, 10, 15,
-	21, 6, 10, 15, 21, 6, 10, 15, 21
-};
-
-/*
-**	This table, for some sort of computing that I will figure out later, is
-**	called 'T' (for now) and has 64 elements. Each element T(i) ('i' being the
-**	i-th element in the table) is calculated with this equation:
-**		T(i) = 2^32 * abs(sin(i));
+**	This table has 64 elements. Each element k5[i] is calculated with this
+**	equation:
+**		k5[i] = 2^32 * abs(sin(i));
 **	Where the value of i (1 through 64) is in radians.
 */
 
-const uint32_t g_k[64] =
+const uint32_t g_k5[64] =
 {
 	0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
 	0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
@@ -87,31 +44,53 @@ const uint32_t g_k[64] =
 	0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
 };
 
-static void	execute_round(int i, unsigned int *tmp, unsigned int *block_chunks)
+/*
+**	There are 4 functions that will each be done 16 times per block of data.
+**	They each have the same functionality of 
+**		- performing a bit operation on the tmp word buffer F.
+**		- determining which block chunk will be added
+**		- determining how much left rotation will be applied to tmp[F]
+**	Each round# function executes these tasks with slightly different math to
+**	ensure the hash is random, and irreversable
+*/
+
+static void	execute_round(uint32_t i, uint32_t *tmp, uint32_t *block_chunks)
 {
-	int				chunk;
+	uint8_t		chunk;
+	uint8_t		rot;
 
 	chunk = 0;
 	if (i < 16)
-		round0to15(i, tmp, &chunk);
+		round1(i, tmp, &chunk, &rot);
 	else if (i < 32)
-		round16to31(i, tmp, &chunk);
+		round2(i, tmp, &chunk, &rot);
 	else if (i < 48)
-		round32to47(i, tmp, &chunk);
+		round3(i, tmp, &chunk, &rot);
 	else
-		round48to63(i, tmp, &chunk);
-	tmp[F] = tmp[F] + tmp[A] + g_k[i] + block_chunks[chunk];
+		round4(i, tmp, &chunk, &rot);
+	tmp[F] = tmp[F] + tmp[A] + g_k5[i] + block_chunks[chunk];
 	tmp[A] = tmp[D];
 	tmp[D] = tmp[C];
 	tmp[C] = tmp[B];
-	tmp[B] = tmp[B] + LROT(tmp[F], g_rot[i]);
+	tmp[B] = tmp[B] + LEFT_ROT(tmp[F], rot);
 }
 
-static void	process_block(unsigned int *words, char *block)
+/*
+**	block_chunks[16]
+**		- the block of data is chunked into 16 32 bit words
+**
+**	tmp_words[5]
+**		- tmp_words are 5 working buffers that are used to help update words[4]
+**
+**	the main processing is done 64 times per block, and depending on the
+**	iteration it will re-update the tmp variables differently
+*/
+
+static void	process_block(uint8_t *block, uint32_t *words)
 {
-	unsigned int	block_chunks[16];
-	unsigned int	tmp_words[5];
-	int				i;
+	uint32_t	block_chunks[16];
+	uint32_t	tmp_words[5];
+	uint8_t		i;
 
 	i = 0;
 	while (i < 16)
@@ -138,7 +117,7 @@ static void	process_block(unsigned int *words, char *block)
 /*
 **	The string MUST be padded as part of the md5 algorithm. The padding works
 **	such that the length (in bits) of the data being hashed should be a
-**	multiple of 512 bits (64 bytes), because data is transformed in chunks of
+**	multiple of 512 bits (64 bytes), because data is processed in chunks of
 **	this size.
 **
 **	To pad the data, first a '1' bit must be concatonated to the end of the
@@ -147,31 +126,45 @@ static void	process_block(unsigned int *words, char *block)
 **	a 64 bit (8 byte) long repsenation of the original data size.
 */
 
-static int	pad_data(char **padded_data, char *data, int *data_size)
+static int	pad_data(uint8_t **padded_data, char *data, uint32_t *data_size)
 {
-	int		padded_data_size;
-	int		bit_representation;
+	uint32_t	padded_data_size;
+	uint32_t	bit_representation;
 
 	padded_data_size = *data_size + 9;
 	while ((padded_data_size) % 64)
 		++padded_data_size;
-	*padded_data = ft_strnew(padded_data_size);
+	*padded_data = ft_memalloc(padded_data_size);
 	if (!(*padded_data))
 		return (ERROR);
 	ft_memcpy(*padded_data, data, *data_size);
-	(*padded_data)[*data_size] = (unsigned char)128;
+	(*padded_data)[*data_size] = (uint8_t)128;
 	bit_representation = *data_size * 8;
 	ft_memcpy(*padded_data + padded_data_size - 8, &bit_representation, 4);
 	*data_size = padded_data_size;
 	return (SUCCESS);
 }
 
-int			md5_hash(char **hash, char *data, int data_size)
+/*
+**	padded_data
+**		- data must first be padded to multiples of 64 bytes
+**
+**	block[64]
+**		- data is processed in blocks of 64 bytes (512 bits)
+**
+**	words[4]
+**		- 4 "word" buffers, each of size 32 bits, are used when processing
+**			the data and have pre-defined initial values. together they hold
+**			the total 128 bit md5 hash. they will be referenced as word[A],
+**			word[B], word[C], and word[D] with macros for A B C and D.
+*/
+
+int			md5_hash(char **hash, char *data, uint32_t data_size)
 {
-	char			*padded_data;
-	char			block[64];
-	int				data_processed;
-	unsigned int	words[4];
+	uint8_t		*padded_data;
+	uint8_t		block[64];
+	uint32_t	data_processed;
+	uint32_t	words[4];
 
 	words[A] = 0x67452301;
 	words[B] = 0xefcdab89;
@@ -184,11 +177,11 @@ int			md5_hash(char **hash, char *data, int data_size)
 	while (data_processed < data_size)
 	{
 		ft_memcpy(block, padded_data + data_processed, 64);
-		process_block(words, block);
+		process_block(block, words);
 		data_processed = data_processed + 64;
 	}
-	ft_sprintf(hash, "%08x%08x%08x%08x", FLIP(words[A]), FLIP(words[B]),
-		FLIP(words[C]), FLIP(words[D]));
-	ft_strdel(&padded_data);
+	ft_sprintf(hash, "%08x%08x%08x%08x", SWPEND(words[A]),
+		SWPEND(words[B]), SWPEND(words[C]), SWPEND(words[D]));
+	ft_memdel((void **)&padded_data);
 	return (SUCCESS);
 }

@@ -6,37 +6,46 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/18 16:34:28 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/19 16:02:17 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 12:49:29 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "md5.h"
+#include "md5_macros.h"
+#include <stdint.h>
 
-#define B 1
-#define C 2
-#define D 3
-#define F 4
-
-void	round0to15(int i, unsigned int *tmp, int *chunk)
+void	round1(uint8_t i, uint32_t *tmp, uint8_t *chunk, uint8_t *rot)
 {
+	static const uint32_t	rot_values[4] = {7, 12, 17, 22};
+
 	tmp[F] = ((tmp[B] & tmp[C]) | (~tmp[B] & tmp[D]));
 	*chunk = i;
+	*rot = rot_values[i % 4];
 }
 
-void	round16to31(int i, unsigned int *tmp, int *chunk)
+void	round2(uint8_t i, uint32_t *tmp, uint8_t *chunk, uint8_t *rot)
 {
+	static const uint32_t	rot_values[4] = {5, 9, 14, 20};
+	
 	tmp[F] = ((tmp[B] & tmp[D]) | (tmp[C] & ~tmp[D]));
 	*chunk = (5 * i + 1) % 16;
+	*rot = rot_values[i % 4];
 }
 
-void	round32to47(int i, unsigned int *tmp, int *chunk)
+void	round3(uint8_t i, uint32_t *tmp, uint8_t *chunk, uint8_t *rot)
 {
+	static const uint32_t	rot_values[4] = {4, 11, 16, 23};
+
 	tmp[F] = (tmp[B] ^ tmp[C] ^ tmp[D]);
 	*chunk = (3 * i + 5) % 16;
+	*rot = rot_values[i % 4];
 }
 
-void	round48to63(int i, unsigned int *tmp, int *chunk)
+void	round4(uint8_t i, uint32_t *tmp, uint8_t *chunk, uint8_t *rot)
 {
+	static const uint32_t	rot_values[4] = {6, 10, 15, 21};
+
 	tmp[F] = (tmp[C] ^ (tmp[B] | ~tmp[D]));
 	*chunk = (7 * i) % 16;
+	*rot = rot_values[i % 4];
 }

@@ -6,21 +6,22 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:39:37 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/19 12:10:56 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 13:01:25 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "arg.h"
+#include "struct_arg.h"
 #include "errors.h"
-#include "input.h"
+#include "struct_input.h"
 #include "ft_queue.h"
+#include <stdint.h>
 
-int		md5_get_arguments(int argc, char **argv, int *argv_index, struct s_input *input)
+int		md5_get_arguments(int argc, char **argv, uint32_t *argv_index, struct s_input *input)
 {
 	struct s_arg	*arg;
 
 	arg = 0;
-	while (*argv_index < argc)
+	while (*argv_index < (uint32_t)argc)
 	{
 		if (init_arg(&arg, argv[*argv_index], TYPE_FILE))
 			return (ERROR);

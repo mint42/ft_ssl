@@ -6,11 +6,11 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/16 15:06:23 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/17 13:13:25 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 13:00:16 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "arg.h"
+#include "struct_arg.h"
 #include "errors.h"
 #include "ft_mem.h"
 

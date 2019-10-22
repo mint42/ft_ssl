@@ -6,14 +6,14 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 17:03:00 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/20 05:00:02 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 13:05:29 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "arg.h"
 #include "errors.h"
-#include "input.h"
 #include "sha256.h"
+#include "struct_arg.h"
+#include "struct_input.h"
 #include "ft_fd.h"
 #include "ft_printf.h"
 #include "ft_put.h"
@@ -110,7 +110,7 @@ static int	handle_argument(struct s_input *input)
 	int		exit_code;
 
 	data = 0;
-	data_size = 0;
+	data_size = ft_strlen(ARG(input->args)->arg);
 	if (ARG(input->args)->type == TYPE_STRING)
 		data = ft_strdup(ARG(input->args)->arg);
 	else

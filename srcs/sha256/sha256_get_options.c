@@ -6,14 +6,14 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:38:54 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/20 12:24:10 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 13:05:29 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "arg.h"
 #include "errors.h"
-#include "input.h"
 #include "sha256.h"
+#include "struct_arg.h"
+#include "struct_input.h"
 #include "ft_printf.h"
 #include "ft_queue.h"
 #include "ft_str.h"

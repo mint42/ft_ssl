@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 17:03:00 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/20 05:09:10 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/21 11:26:08 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,7 @@ static int	handle_argument(struct s_input *input)
 	int		exit_code;
 
 	data = 0;
-	data_size = 0;
+	data_sze = ft_strlen(ARG(input->args)->arg);
 	if (ARG(input->args)->type == TYPE_STRING)
 		data = ft_strdup(ARG(input->args)->arg);
 	else
