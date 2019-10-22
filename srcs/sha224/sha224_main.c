@@ -6,12 +6,13 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 17:03:00 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 13:11:28 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 15:53:47 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "errors.h"
 #include "sha224.h"
+#include "sha224_options.h"
 #include "struct_arg.h"
 #include "struct_input.h"
 #include "ft_fd.h"
@@ -28,32 +29,32 @@ static void print_hash(char *hash, char *data, struct s_input *input)
 {
 	if (ARG(input->args)->type == TYPE_STDIN)
 	{
-		if (input->opts & (1 << SHA224_OP_P))
+		if (input->opts & (1 << OP_P))
 			ft_putstr(data);
 		ft_putendl(hash);
 	}
-	else if (input->opts & (1 << SHA224_OP_Q))
+	else if (input->opts & (1 << OP_Q))
 		ft_putendl(hash);
 	else if (ARG(input->args)->type == TYPE_FILE)
 	{
-		if (input->opts & (1 << SHA224_OP_R))
+		if (input->opts & (1 << OP_R))
 			ft_printf("%s %s\n", hash, ARG(input->args)->arg);
 		else
 			ft_printf("SHA224 (%s) = %s\n", ARG(input->args)->arg, hash);
 	}
 	else
 	{
-		if (input->opts & (1 << SHA224_OP_R))
+		if (input->opts & (1 << OP_R))
 			ft_printf("%s \"%s\"\n", hash, ARG(input->args)->arg);
 		else
 			ft_printf("SHA224 (\"%s\") = %s\n", ARG(input->args)->arg, hash);
 	}
 }
 
-static int	read_file(int fd, char **data, int *data_size)
+static int	read_file(int fd, char **data, uint32_t *data_size)
 {
-	int		max_data_size;
-	int		red;
+	uint32_t	max_data_size;
+	int			red;
 
 	max_data_size = 80;
 	*data = ft_strnew(max_data_size);
@@ -74,7 +75,7 @@ static int	read_file(int fd, char **data, int *data_size)
 	return (red);
 }
 
-static int	get_data_from_fd(struct s_arg *arg, char **data, int *data_size)
+static int	get_data_from_fd(struct s_arg *arg, char **data, uint32_t *data_size)
 {
 	int		fd;
 
@@ -104,10 +105,10 @@ static int	get_data_from_fd(struct s_arg *arg, char **data, int *data_size)
 
 static int	handle_argument(struct s_input *input)
 {
-	char	*hash;
-	char	*data;
-	int		data_size;
-	int		exit_code;
+	char		*hash;
+	char		*data;
+	uint32_t	data_size;
+	int			exit_code;
 
 	data = 0;
 	data_size = ft_strlen(ARG(input->args)->arg);
@@ -133,7 +134,7 @@ static int	handle_argument(struct s_input *input)
 int		sha224_main(int argc, char **argv)
 {
 	struct s_input	input;
-	int				argv_index;
+	uint32_t		argv_index;
 
 	input.opts = 0;
 	input.args = ft_queue_init();

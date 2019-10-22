@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:37:47 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 13:10:53 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 15:51:19 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,14 @@
 #include "struct_arg.h"
 #include "struct_input.h"
 #include "ft_queue.h"
+#include <stdint.h>
 
-int		sha224_get_arguments(int argc, char **argv, int *argv_index, struct s_input *input)
+int		sha224_get_arguments(int argc, char **argv, uint32_t *argv_index, struct s_input *input)
 {
 	struct s_arg	*arg;
 
 	arg = 0;
-	while (*argv_index < argc)
+	while (*argv_index < (uint32_t)argc)
 	{
 		if (init_arg(&arg, argv[*argv_index], TYPE_FILE))
 			return (ERROR);

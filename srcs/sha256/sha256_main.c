@@ -6,12 +6,13 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 17:03:00 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 13:05:29 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 15:50:33 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "errors.h"
 #include "sha256.h"
+#include "sha256_options.h"
 #include "struct_arg.h"
 #include "struct_input.h"
 #include "ft_fd.h"
@@ -28,22 +29,22 @@ static void print_hash(char *hash, char *data, struct s_input *input)
 {
 	if (ARG(input->args)->type == TYPE_STDIN)
 	{
-		if (input->opts & (1 << SHA256_OP_P))
+		if (input->opts & (1 << OP_P))
 			ft_putstr(data);
 		ft_putendl(hash);
 	}
-	else if (input->opts & (1 << SHA256_OP_Q))
+	else if (input->opts & (1 << OP_Q))
 		ft_putendl(hash);
 	else if (ARG(input->args)->type == TYPE_FILE)
 	{
-		if (input->opts & (1 << SHA256_OP_R))
+		if (input->opts & (1 << OP_R))
 			ft_printf("%s %s\n", hash, ARG(input->args)->arg);
 		else
 			ft_printf("SHA256 (%s) = %s\n", ARG(input->args)->arg, hash);
 	}
 	else
 	{
-		if (input->opts & (1 << SHA256_OP_R))
+		if (input->opts & (1 << OP_R))
 			ft_printf("%s \"%s\"\n", hash, ARG(input->args)->arg);
 		else
 			ft_printf("SHA256 (\"%s\") = %s\n", ARG(input->args)->arg, hash);
@@ -133,7 +134,7 @@ static int	handle_argument(struct s_input *input)
 int		sha256_main(int argc, char **argv)
 {
 	struct s_input	input;
-	int				argv_index;
+	uint32_t		argv_index;
 
 	input.opts = 0;
 	input.args = ft_queue_init();

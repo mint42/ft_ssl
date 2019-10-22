@@ -6,36 +6,16 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 13:48:10 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/20 04:20:41 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 15:48:42 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "errors.h"
 #include "sha256.h"
+#include "sha256_macros.h"
 #include "ft_mem.h"
 #include "ft_printf.h"
-#include "ft_str.h"
 #include <stdint.h>
-
-#define RROT(bits, rot) (((unsigned int)(bits >> rot)) | (bits << (32 - rot)))
-#define FLIP(bits) ((bits >> 24) | ((bits & 0xff0000) >> 8) | ((bits & 0xff00) << 8) | (bits << 24))
-
-# define A_O 0
-# define B_O 1
-# define C_O 2
-# define D_O 3
-# define E_O 4
-# define F_O 5
-# define G_O 6
-# define H_O 7
-# define A 8
-# define B 9
-# define C 10
-# define D 11
-# define E 12
-# define F 13
-# define G 14
-# define H 15
 
 const uint32_t	g_k256[64] =
 {
@@ -57,9 +37,9 @@ const uint32_t	g_k256[64] =
    0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
 
-static void	execute_round(int i, unsigned int *word, unsigned int *w)
+static void	execute_round(uint32_t i, uint32_t *word, uint32_t *w)
 {
-	unsigned int	tmp[6];
+	uint32_t	tmp[6];
 
 	tmp[0] = RROT(word[E], 6) ^ RROT(word[E], 11) ^ RROT(word[E], 25);
 	tmp[1] = (word[E] & word[F]) ^ (~word[E] & word[G]);
@@ -77,15 +57,14 @@ static void	execute_round(int i, unsigned int *word, unsigned int *w)
 	word[A] = tmp[2] + tmp[5];
 }
 
-static void	build_w(unsigned int *w, char *block)
+static void	build_w(uint32_t *w, uint8_t *block)
 {
-	unsigned int	tmp1;
-	unsigned int	tmp2;
-	int				i;
+	uint32_t	tmp1;
+	uint32_t	tmp2;
+	int			i;
 
 	ft_memcpy(w, block, 64);
-	i = 16;
-	while (i < 64)
+	i = 16; while (i < 64)
 	{
 		tmp1 = RROT(w[i - 15], 7) ^ RROT(w[i - 15], 18) ^ (w[i - 15] >> 3);
 		tmp2 = RROT(w[i - 2], 17) ^ RROT(w[i - 2], 19) ^ (w[i - 2] >> 10);
@@ -94,9 +73,9 @@ static void	build_w(unsigned int *w, char *block)
 	}
 }
 
-static void	process_block(unsigned int *word, char *block)
+static void	process_block(uint32_t *word, uint8_t *block)
 {
-	unsigned int	w[64];
+	uint32_t	w[64];
 	int				i;
 
 	build_w(w, block);
@@ -124,25 +103,25 @@ static void	process_block(unsigned int *word, char *block)
 	word[H_O] = word[H_O] + word[H];
 }
 
-static int	pad_data(char **padded_data, char *data, int *data_size)
+static int	pad_data(uint8_t **padded_data, char *data, uint32_t *data_size)
 {
-	int		padded_data_size;
-	int		bit_representation;
-	int		i;
+	uint32_t	padded_data_size;
+	uint32_t	bit_representation;
+	uint32_t	i;
 
 	padded_data_size = *data_size + 9;
 	while ((padded_data_size) % 64)
 		++padded_data_size;
-	*padded_data = ft_strnew(padded_data_size);
+	*padded_data = ft_memalloc(padded_data_size);
 	if (!(*padded_data))
 		return (ERROR);
 	ft_memcpy(*padded_data, data, *data_size);
-	(*padded_data)[*data_size] = (unsigned char)128;
+	(*padded_data)[*data_size] = (uint8_t)128;
 	bit_representation = *data_size * 8;
 	i = 0;
 	while (i < ((padded_data_size - 8) / 4))
 	{
-		((unsigned int *)(*padded_data))[i] = FLIP(((unsigned int *)(*padded_data))[i]);
+		((uint32_t *)(*padded_data))[i] = SWPEND(((uint32_t *)(*padded_data))[i]);
 		++i;
 	}
 	ft_memcpy(*padded_data + padded_data_size - 4, &bit_representation, 4);
@@ -150,12 +129,12 @@ static int	pad_data(char **padded_data, char *data, int *data_size)
 	return (SUCCESS);
 }
 
-int			sha256_hash(char **hash, char *data, int data_size)
+int			sha256_hash(char **hash, char *data, uint32_t data_size)
 {
-	char			*padded_data;
-	char			block[64];
-	unsigned int	word[16];
-	int				data_processed;
+	uint8_t		*padded_data;
+	uint8_t		block[64];
+	uint32_t	word[16];
+	uint32_t	data_processed;
 
 	sha256_init_words(word);
 	padded_data = 0;
@@ -170,6 +149,6 @@ int			sha256_hash(char **hash, char *data, int data_size)
 	}
 	ft_sprintf(hash, "%08x%08x%08x%08x%08x%08x%08x%08x", word[A_O], word[B_O],
 		word[C_O], word[D_O], word[E_O], word[F_O], word[G_O], word[H_O]);
-	ft_strdel(&padded_data);
+	ft_memdel((void **)&padded_data);
 	return (SUCCESS);
 }
