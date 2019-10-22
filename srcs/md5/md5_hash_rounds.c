@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/18 16:34:28 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 12:49:29 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 16:09:17 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	round1(uint8_t i, uint32_t *tmp, uint8_t *chunk, uint8_t *rot)
 void	round2(uint8_t i, uint32_t *tmp, uint8_t *chunk, uint8_t *rot)
 {
 	static const uint32_t	rot_values[4] = {5, 9, 14, 20};
-	
+
 	tmp[F] = ((tmp[B] & tmp[D]) | (tmp[C] & ~tmp[D]));
 	*chunk = (5 * i + 1) % 16;
 	*rot = rot_values[i % 4];

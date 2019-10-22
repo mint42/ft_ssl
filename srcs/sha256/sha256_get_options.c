@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:38:54 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 15:44:58 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 16:10:55 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@
 #include "ft_str.h"
 #include <stdint.h>
 
-static int		enqueue_new_arg(uint8_t option, struct s_input *input, char **argv, uint32_t *argv_index)
+static int	enqueue_new_arg(uint8_t option, struct s_input *input, char **argv,
+				uint32_t *argv_index)
 {
 	struct s_arg	*arg;
 
@@ -41,7 +42,7 @@ static int		enqueue_new_arg(uint8_t option, struct s_input *input, char **argv, 
 	return (SUCCESS);
 }
 
-static int		get_option(uint8_t *option, char *argv)
+static int	get_option(uint8_t *option, char *argv)
 {
 	static const char	*valid_ops[TOTAL_VALID_OPS + 1] = {
 		"-p",
@@ -61,7 +62,8 @@ static int		get_option(uint8_t *option, char *argv)
 	return (ERROR);
 }
 
-int				sha256_get_options(int argc, char **argv, uint32_t *argv_index, struct s_input *input)
+int			sha256_get_options(int argc, char **argv, uint32_t *argv_index,
+				struct s_input *input)
 {
 	uint8_t		option;
 
@@ -70,7 +72,8 @@ int				sha256_get_options(int argc, char **argv, uint32_t *argv_index, struct s_
 	{
 		if (get_option(&option, argv[*argv_index]) == ERROR)
 		{
-			ft_printf("ft_ssl: sha256: '%s' is an invalid option", argv[*argv_index]);
+			ft_printf("ft_ssl: sha256: '%s' is an invalid option",
+				argv[*argv_index]);
 			ft_queue_del(&(input->args), ft_queue_del_content);
 			return (ERROR);
 		}

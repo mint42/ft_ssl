@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:43:46 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 13:30:30 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 16:05:39 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,7 @@
 **	Where the value of i (1 through 64) is in radians.
 */
 
-const uint32_t g_k5[64] =
-{
+const uint32_t g_k5[64] = {
 	0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
 	0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
 	0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
@@ -46,7 +45,7 @@ const uint32_t g_k5[64] =
 
 /*
 **	There are 4 functions that will each be done 16 times per block of data.
-**	They each have the same functionality of 
+**	They each have the same functionality of
 **		- performing a bit operation on the tmp word buffer F.
 **		- determining which block chunk will be added
 **		- determining how much left rotation will be applied to tmp[F]

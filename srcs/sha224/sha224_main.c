@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 17:03:00 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 15:53:47 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 16:20:31 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 #include <string.h>
 #include <unistd.h>
 
-static void print_hash(char *hash, char *data, struct s_input *input)
+static void	print_hash(char *hash, char *data, struct s_input *input)
 {
 	if (ARG(input->args)->type == TYPE_STDIN)
 	{
@@ -75,7 +75,8 @@ static int	read_file(int fd, char **data, uint32_t *data_size)
 	return (red);
 }
 
-static int	get_data_from_fd(struct s_arg *arg, char **data, uint32_t *data_size)
+static int	get_data_from_fd(struct s_arg *arg, char **data,
+				uint32_t *data_size)
 {
 	int		fd;
 
@@ -131,7 +132,7 @@ static int	handle_argument(struct s_input *input)
 	return (SUCCESS);
 }
 
-int		sha224_main(int argc, char **argv)
+int			sha224_main(int argc, char **argv)
 {
 	struct s_input	input;
 	uint32_t		argv_index;

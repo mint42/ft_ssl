@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:39:37 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 13:01:25 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 16:07:40 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 #include "ft_queue.h"
 #include <stdint.h>
 
-int		md5_get_arguments(int argc, char **argv, uint32_t *argv_index, struct s_input *input)
+int		md5_get_arguments(int argc, char **argv, uint32_t *argv_index,
+			struct s_input *input)
 {
 	struct s_arg	*arg;
 

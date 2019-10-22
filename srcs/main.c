@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/16 12:02:51 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/20 04:10:47 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 16:23:30 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ static int		get_command(char *argv)
 		"sha256",
 		0,
 	};
-	
+
 	command = 0;
 	while (command < TOTAL_VALID_COMMANDS)
 	{
@@ -57,7 +57,8 @@ int				main(int argc, char **argv)
 
 	if (argc < 2)
 	{
-		write(STDOUT_FD, "usage: ft_ssl command [command opts] [command args]\n", 52);
+		write(STDOUT_FD,
+			"usage: ft_ssl command [command opts] [command args]\n", 52);
 		return (0);
 	}
 	command = get_command(argv[1]);
