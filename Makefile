@@ -6,39 +6,34 @@
 #    By: rreedy <marvin@42.fr>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/16 11:54:37 by rreedy            #+#    #+#              #
-#    Updated: 2019/10/20 04:15:05 by rreedy           ###   ########.fr        #
+#    Updated: 2019/10/22 10:58:18 by rreedy           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME := ft_ssl
-LIB := libft/libft.a
+include config.mk
 
-OBJS := $(patsubst %.c,%.o,$(wildcard ./srcs/*.c))
-OBJS += $(patsubst %.c,%.o,$(wildcard ./srcs/md5/*.c))
-OBJS += $(patsubst %.c,%.o,$(wildcard ./srcs/sha256/*.c))
-OBJS += $(patsubst %.c,%.o,$(wildcard ./srcs/sha224/*.c))
+SRCS := $(foreach src_dir, $(SRC_DIRS), $(wildcard $(src_dir)/*.c))
+OBJS := $(patsubst %.c,%.o,$(SRCS))
 
-CC := gcc
-INCLUDES := -I./includes -I./libft/includes -I./libft/includes/ft_printf
-CFLAGS += -g -Wall -Wextra -Werror $(INCLUDES)
-LFLAGS += -L./libft -lft
+LIB := $(LIB_DIR)/$(LIB_NAME)
+MAKE_LIB := make -C $(LIB_DIR) -f $(LIB_MAKEFILE) --no-print-directory
 
 .PHONY: all clean fclean re name
 
 all: $(NAME)
 
 $(NAME): $(LIB) $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LFLAGS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LDFLAGS)
 
 $(LIB):
-	@- make -C libft/ all
+	@- $(MAKE_LIB) all
 
 clean:
 	@- $(RM) $(OBJS)
-	@- make -C libft/ clean
+	@- $(MAKE_LIB) clean
 
 fclean: clean
 	@- $(RM) $(NAME)
-	@- make -C libft/ fclean
+	@- $(MAKE_LIB) fclean
 
 re: fclean all
