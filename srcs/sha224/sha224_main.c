@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 17:03:00 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 16:20:31 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 18:00:09 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,8 +126,7 @@ static int	handle_argument(struct s_input *input)
 	if (sha224_hash(&hash, data, data_size) == ERROR)
 		return (ERROR);
 	print_hash(hash, data, input);
-	if (ARG(input->args)->type != TYPE_STRING)
-		ft_strdel(&data);
+	ft_strdel(&data);
 	ft_strdel(&hash);
 	return (SUCCESS);
 }
