@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:38:54 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 18:12:34 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 19:46:57 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,10 @@ int			sha224_get_options(int argc, char **argv, uint32_t *argv_index,
 		}
 		input->opts = (input->opts) | (1 << option);
 		if (option == (uint8_t)OP_S && *argv_index + 1 >= (uint32_t)argc)
+		{
+			ft_queue_del(&(input->args), ft_queue_del_content);
 			return (ERROR);
+		}
 		if (option == (uint8_t)OP_P || option == (uint8_t)OP_S)
 			enqueue_new_arg(option, input, argv, argv_index);
 		++(*argv_index);

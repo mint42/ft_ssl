@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 17:03:00 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 18:00:34 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 19:40:11 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include "struct_arg.h"
 #include "struct_input.h"
 #include "ft_fd.h"
+#include "ft_mem.h"
 #include "ft_printf.h"
 #include "ft_put.h"
 #include "ft_queue.h"
@@ -134,6 +135,7 @@ int			sha256_main(int argc, char **argv)
 {
 	struct s_input	input;
 	uint32_t		argv_index;
+	void			*content;
 
 	input.opts = 0;
 	input.args = ft_queue_init();
@@ -149,7 +151,8 @@ int			sha256_main(int argc, char **argv)
 			ft_queue_del(&(input.args), 0);
 			return (ERROR);
 		}
-		ft_dequeue(input.args);
+		content = ft_dequeue(input.args);
+		ft_memdel(&content);
 	}
 	ft_queue_del(&(input.args), ft_queue_del_content);
 	return (SUCCESS);

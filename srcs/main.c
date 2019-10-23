@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/16 12:02:51 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 17:59:02 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 19:53:28 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,6 @@ static void		print_valid_commands()
 	write(STDOUT_FD, "Cipher commands:\n", 17);
 }
 
-#include <unistd.h>
 int				main(int argc, char **argv)
 {
 	int		command;
@@ -83,6 +82,5 @@ int				main(int argc, char **argv)
 		return (0);
 	}
 	execute_command(command, argc, argv);
-	sleep(10);
 	return (0);
 }
