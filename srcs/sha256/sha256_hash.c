@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 13:48:10 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 16:33:35 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 16:39:35 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,12 +87,9 @@ static void	process_block(uint8_t *block, uint32_t *word)
 	word[F] = word[F_O];
 	word[G] = word[G_O];
 	word[H] = word[H_O];
-	i = 0;
-	while (i < 64)
-	{
+	i = -1;
+	while (++i < 64)
 		execute_round(i, word, w);
-		++i;
-	}
 	word[A_O] = word[A_O] + word[A];
 	word[B_O] = word[B_O] + word[B];
 	word[C_O] = word[C_O] + word[C];
@@ -121,7 +118,8 @@ static int	pad_data(uint8_t **padded_data, char *data, uint32_t *data_size)
 	i = 0;
 	while (i < ((padded_data_size - 8) / 4))
 	{
-		((uint32_t *)(*padded_data))[i] = SWPEND(((uint32_t *)(*padded_data))[i]);
+		((uint32_t *)(*padded_data))[i] =
+			SWPEND(((uint32_t *)(*padded_data))[i]);
 		++i;
 	}
 	ft_memcpy(*padded_data + padded_data_size - 4, &bit_representation, 4);

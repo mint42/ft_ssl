@@ -6,12 +6,12 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/16 13:09:48 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 12:52:25 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 16:47:13 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef INPUT_H
-# define INPUT_H
+#ifndef STRUCT_INPUT_H
+# define STRUCT_INPUT_H
 
 # include <stdint.h>
 

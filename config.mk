@@ -6,7 +6,7 @@
 #    By: rreedy <marvin@42.fr>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/22 09:39:36 by rreedy            #+#    #+#              #
-#    Updated: 2019/10/22 10:41:44 by rreedy           ###   ########.fr        #
+#    Updated: 2019/10/22 16:45:02 by rreedy           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,7 +29,7 @@ INCLUDE_DIRS := ./includes
 INCLUDE_DIRS += ./includes/md5
 INCLUDE_DIRS += ./includes/sha256
 INCLUDE_DIRS += ./includes/sha224
-INCLUDE_DIRS += ./includes/sha512
+#INCLUDE_DIRS += ./includes/sha512
 
 CC := gcc
 CFLAGS := -g

@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   arg.h                                              :+:      :+:    :+:   */
+/*   struct_arg.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/16 14:58:00 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 13:00:59 by rreedy           ###   ########.fr       */
+/*   Created: 2019/10/22 16:41:36 by rreedy            #+#    #+#             */
+/*   Updated: 2019/10/22 16:41:57 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ARG_H
-# define ARG_H
+#ifndef STRUCT_ARG_H
+# define STRUCT_ARG_H
 
 # include <stdint.h>
 
@@ -27,6 +27,6 @@ struct			s_arg
 	uint8_t		type;
 };
 
-int		init_arg(struct s_arg **arg, char *string, int type);
+int				init_arg(struct s_arg **arg, char *string, int type);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 12:25:09 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 13:00:40 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 16:40:30 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 
 # define MD5_HASH_SIZE 128
 
-struct	s_input;
+struct s_input;
 
 int		md5_main(int argc, char **argv);
 int		md5_get_options(int argc, char **argv, uint32_t *argv_index,

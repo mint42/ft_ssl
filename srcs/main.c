@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/16 12:02:51 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 16:23:30 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 17:04:14 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,19 @@ static int		get_command(char *argv)
 	return (-1);
 }
 
+static void		print_valid_commands()
+{
+	write(STDOUT_FD, "\n", 1);
+	write(STDOUT_FD, "Standard commands:\n", 19);
+	write(STDOUT_FD, "\n", 1);
+	write(STDOUT_FD, "Message Digest commands:\n", 25);
+	write(STDOUT_FD, "md5\n", 4);
+	write(STDOUT_FD, "sha256\n", 7);
+	write(STDOUT_FD, "sha224\n", 7);
+	write(STDOUT_FD, "\n", 1);
+	write(STDOUT_FD, "Cipher commands:\n", 17);
+}
+
 int				main(int argc, char **argv)
 {
 	int		command;
@@ -65,6 +78,7 @@ int				main(int argc, char **argv)
 	if (command == -1)
 	{
 		ft_printf("ft_ssl: Error: '%s' is an invalid command.\n", argv[1]);
+		print_valid_commands();
 		return (0);
 	}
 	execute_command(command, argc, argv);
