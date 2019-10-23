@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/22 15:34:17 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 16:55:31 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 17:26:52 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,10 @@
 # define SHA224_HASH_SIZE 224
 
 # define RROT(bits, rot) (((uint32_t)(bits >> rot)) | (bits << (32 - rot)))
-# define SWPEND(b) (b >> 24 | (b & 0xff0000 >> 8) | (b & 0xff00 << 8) | b << 24)
+# define BYTE2(b) (b & 0xff00)
+# define BYTE3(b) (b & 0xff0000)
+# define SWPEND(b) ((b >> 24) | (BYTE3(b) >> 8) | (BYTE2(b) << 8) | (b << 24))
+
 
 # define A_O 0
 # define B_O 1

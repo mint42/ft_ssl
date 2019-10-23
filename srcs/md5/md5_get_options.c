@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:39:25 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 16:07:17 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 17:49:09 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ static int	get_option(uint8_t *option, char *argv)
 		0,
 	};
 
+	*option = 0;
 	while (*option < TOTAL_VALID_OPS)
 	{
 		if (ft_strequ(valid_ops[*option], argv))

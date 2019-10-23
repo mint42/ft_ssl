@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:43:46 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 16:05:39 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 17:15:07 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ static void	execute_round(uint32_t i, uint32_t *tmp, uint32_t *block_chunks)
 	tmp[A] = tmp[D];
 	tmp[D] = tmp[C];
 	tmp[C] = tmp[B];
-	tmp[B] = tmp[B] + LEFT_ROT(tmp[F], rot);
+	tmp[B] = tmp[B] + LROT(tmp[F], rot);
 }
 
 /*
