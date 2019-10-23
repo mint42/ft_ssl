@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 10:39:25 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 18:11:59 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 19:12:59 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ static int	enqueue_new_arg(uint8_t option, struct s_input *input, char **argv,
 		++(*argv_index);
 		if (init_arg(&arg, argv[*argv_index], TYPE_STRING))
 			return (ERROR);
+		ft_printf("string: %s %p\n", arg->arg, arg);
 		ft_enqueue(input->args, arg);
 	}
 	return (SUCCESS);

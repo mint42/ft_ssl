@@ -6,7 +6,7 @@
 /*   By: rreedy <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/16 15:49:52 by rreedy            #+#    #+#             */
-/*   Updated: 2019/10/22 17:55:16 by rreedy           ###   ########.fr       */
+/*   Updated: 2019/10/22 19:12:21 by rreedy           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,10 +135,12 @@ static int	handle_argument(struct s_input *input)
 	return (SUCCESS);
 }
 
+#include <stdlib.h>
 int			md5_main(int argc, char **argv)
 {
 	struct s_input	input;
 	uint32_t		argv_index;
+	void			*content;
 
 	input.opts = 0;
 	input.args = ft_queue_init();
@@ -154,8 +156,9 @@ int			md5_main(int argc, char **argv)
 			ft_queue_del(&(input.args), 0);
 			return (ERROR);
 		}
-		ft_dequeue(input.args);
+		content = ft_dequeue(input.args);
+		ft_memdel(&content);
 	}
-	ft_queue_del(&(input.args), ft_queue_del_content);
+//	ft_queue_del(&(input.args), ft_queue_del_content);
 	return (SUCCESS);
 }
