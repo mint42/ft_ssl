@@ -15,7 +15,6 @@
 #include "sha224_options.h"
 #include "struct_arg.h"
 #include "struct_input.h"
-#include "ft_fd.h"
 #include "ft_mem.h"
 #include "ft_printf.h"
 #include "ft_put.h"
@@ -91,7 +90,7 @@ static int	get_data_from_fd(struct s_arg *arg, char **data,
 		}
 	}
 	else
-		fd = STDIN_FD;
+		fd = STDIN_FILENO;
 	if (read_file(fd, data, data_size) == -1)
 	{
 		ft_printf("ft_ssl: sha224: %s\n", strerror(errno));

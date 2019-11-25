@@ -15,7 +15,6 @@
 #include "sha224.h"
 #include "sha256.h"
 #include "ssl.h"
-#include "ft_fd.h"
 #include "ft_printf.h"
 #include "ft_str.h"
 #include <unistd.h>
@@ -53,15 +52,15 @@ static int		get_command(char *argv)
 
 static void		print_valid_commands()
 {
-	write(STDOUT_FD, "\n", 1);
-	write(STDOUT_FD, "Standard commands:\n", 19);
-	write(STDOUT_FD, "\n", 1);
-	write(STDOUT_FD, "Message Digest commands:\n", 25);
-	write(STDOUT_FD, "md5\n", 4);
-	write(STDOUT_FD, "sha256\n", 7);
-	write(STDOUT_FD, "sha224\n", 7);
-	write(STDOUT_FD, "\n", 1);
-	write(STDOUT_FD, "Cipher commands:\n", 17);
+	write(STDOUT_FILENO, "\n", 1);
+	write(STDOUT_FILENO, "Standard commands:\n", 19);
+	write(STDOUT_FILENO, "\n", 1);
+	write(STDOUT_FILENO, "Message Digest commands:\n", 25);
+	write(STDOUT_FILENO, "md5\n", 4);
+	write(STDOUT_FILENO, "sha256\n", 7);
+	write(STDOUT_FILENO, "sha224\n", 7);
+	write(STDOUT_FILENO, "\n", 1);
+	write(STDOUT_FILENO, "Cipher commands:\n", 17);
 }
 
 int				main(int argc, char **argv)
@@ -70,7 +69,7 @@ int				main(int argc, char **argv)
 
 	if (argc < 2)
 	{
-		write(STDOUT_FD,
+		write(STDOUT_FILENO,
 			"usage: ft_ssl command [command opts] [command args]\n", 52);
 		return (0);
 	}

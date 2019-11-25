@@ -15,7 +15,6 @@
 #include "struct_input.h"
 #include "md5.h"
 #include "md5_options.h"
-#include "ft_fd.h"
 #include "ft_printf.h"
 #include "ft_put.h"
 #include "ft_queue.h"
@@ -92,7 +91,7 @@ static int	get_data_from_fd(struct s_arg *arg, char **data,
 		}
 	}
 	else
-		fd = STDIN_FD;
+		fd = STDIN_FILENO;
 	if (read_file(fd, data, data_size) == -1)
 	{
 		ft_printf("ft_ssl: md5: %s\n", strerror(errno));
