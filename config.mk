@@ -6,7 +6,7 @@
 #    By: rreedy <marvin@42.fr>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/22 09:39:36 by rreedy            #+#    #+#              #
-#    Updated: 2019/10/22 19:31:16 by rreedy           ###   ########.fr        #
+#    Updated: 2020/04/22 21:03:08 by mint             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,6 @@ LIB_DIR := ./libft
 LIB_NAME := libft.a
 LIB_MAKEFILE := Makefile
 LIB_INCLUDE_DIRS := $(LIB_DIR)/includes
-LIB_INCLUDE_DIRS += $(LIB_DIR)/includes/ft_printf
 
 SRC_DIRS := ./srcs
 SRC_DIRS += ./srcs/md5
